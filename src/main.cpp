@@ -108,6 +108,9 @@ int main()
 		}
 
 		ImGui::ColorEdit3("Clear Color", opengl.clear_color);
+		ImGui::ColorEdit3("Cube 1 color", opengl.cubeColor);
+
+		ImGui::SliderFloat3("Light Position", opengl.lightPos, -5.0, 5.0);
 		ImGui::End();
 
 		after_frame();
@@ -146,7 +149,7 @@ int init_gui()
 	if (!glfwInit())
 		return -1;
 
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL & ImGUI", NULL, NULL);
 
 	if (!window)
@@ -155,7 +158,7 @@ int init_gui()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
 	if (glewInit() != GLEW_OK)
 	{
