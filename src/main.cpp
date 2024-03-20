@@ -110,7 +110,9 @@ int main()
 		ImGui::ColorEdit3("Clear Color", opengl.clear_color);
 		ImGui::ColorEdit3("Cube 1 color", opengl.cubeColor);
 
-		ImGui::SliderFloat3("Light Position", opengl.lightPos, -5.0, 5.0);
+		ImGui::SliderFloat3("Light Position", opengl.lightPos, -2.0, 2.0);
+
+		ImGui::InputFloat4("Phong Settings", opengl.phongConstants);
 		ImGui::End();
 
 		after_frame();

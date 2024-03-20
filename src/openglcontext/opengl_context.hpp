@@ -6,7 +6,7 @@
 #include "../stb_image.h"
 #include "framebuffer.h"
 #include "../shader.hpp"
-#include "camera.h"
+#include "../cameras/camera.h"
 
 class OpenGLContext
 {
@@ -19,6 +19,7 @@ public:
     float clear_color[3];
     float cubeColor[3];
     float lightPos[3];
+    float phongConstants[4];
 
     OpenGLContext(float w, float h);
 
