@@ -17,8 +17,8 @@ public:
     Camera camera;
     FrameBuffer sceneBuffer;
     float clear_color[3];
-    float lightColor[3];
-    float lightPos[3];
+    float dirColor[3], pointColor[3], spotColor[3];
+    float dirPos[3], pointPos[3];
     float phongConstants[4];
 
     OpenGLContext(float w, float h);

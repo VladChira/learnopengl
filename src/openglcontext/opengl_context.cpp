@@ -12,6 +12,7 @@ Shader cubeShader, lightShader;
 unsigned int VBO, VAO;
 unsigned int lightVAO;
 unsigned int texture;
+unsigned int texture_specular;
 
 unsigned int OpenGLContext::getFrameBufferTexture()
 {
@@ -119,6 +120,32 @@ void OpenGLContext::init()
     }
     stbi_image_free(data);
 
+
+    glGenTextures(1, &texture_specular);
+    glBindTexture(GL_TEXTURE_2D, texture_specular);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    data = stbi_load("../textures/container_specular.jpg", &imageWidth, &imageHeight, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+
+
     sceneBuffer.Init(this->width, this->height);
 }
 
@@ -129,8 +156,25 @@ void OpenGLContext::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     cubeShader.use();
-    cubeShader.setVec3("lightColor", lightColor[0], lightColor[1], lightColor[2]);
-    cubeShader.setVec3("lightPos", lightPos[0], lightPos[1], lightPos[2]);
+    // directional light
+    cubeShader.setVec3("dirLight.direction",  dirPos[0], dirPos[1], dirPos[2]);
+    cubeShader.setVec3("dirLight.color", dirColor[0], dirColor[1], dirColor[2]);
+    // point light 1
+    cubeShader.setVec3("pointLights[0].position", pointPos[0], pointPos[1], pointPos[2]);
+    cubeShader.setVec3("pointLights[0].color", pointColor[0], pointColor[1], pointColor[2]);
+    cubeShader.setFloat("pointLights[0].constant", 1.0f);
+    cubeShader.setFloat("pointLights[0].linear", 0.09f);
+    cubeShader.setFloat("pointLights[0].quadratic", 0.032f);
+    // spotLight
+    cubeShader.setVec3("spotLight.position", camera.Position);
+    cubeShader.setVec3("spotLight.direction", camera.Front);
+    cubeShader.setVec3("spotLight.color", spotColor[0], spotColor[1], spotColor[2]);
+    cubeShader.setFloat("spotLight.constant", 1.0f);
+    cubeShader.setFloat("spotLight.linear", 0.09f);
+    cubeShader.setFloat("spotLight.quadratic", 0.032f);
+    cubeShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    cubeShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
     cubeShader.setVec3("viewPos", camera.Position);
     cubeShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
     cubeShader.setFloat("material.ka", phongConstants[0]);
@@ -139,10 +183,15 @@ void OpenGLContext::render()
     cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     cubeShader.setFloat("material.ks", phongConstants[2]);
     cubeShader.setFloat("material.shininess", phongConstants[3]);
+
     cubeShader.setInt("material.diffuse", 0);
+    cubeShader.setInt("material.specular", 1);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_specular);
 
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), this->width / this->height, 0.1f, 100.0f);
     cubeShader.setMat4("projection", projection);
@@ -156,8 +205,6 @@ void OpenGLContext::render()
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // render another
-    cubeShader.setVec3("material.ambient", lightColor[0], lightColor[1], lightColor[2]);
-    cubeShader.setVec3("material.diffuse", lightColor[0], lightColor[1], lightColor[2]);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(2.0f, 0.1f, 1.8f));
     cubeShader.setMat4("model", model);
@@ -166,10 +213,10 @@ void OpenGLContext::render()
     lightShader.use();
     lightShader.setMat4("projection", projection);
     lightShader.setMat4("view", view);
-    lightShader.setVec3("lightColor", lightColor[0], lightColor[1], lightColor[2]);
+    lightShader.setVec3("lightColor", pointColor[0], pointColor[1], pointColor[2]);
 
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(lightPos[0], lightPos[1], lightPos[2]));
+    model = glm::translate(model, glm::vec3(pointPos[0], pointPos[1], pointPos[2]));
     model = glm::scale(model, glm::vec3(0.2f));
     lightShader.setMat4("model", model);
     glBindVertexArray(lightVAO);
@@ -186,13 +233,25 @@ OpenGLContext::OpenGLContext(float w, float h) : camera(glm::vec3(0.0f, 0.0f, 3.
     clear_color[1] = 0.0f;
     clear_color[2] = 0.0f;
 
-    lightColor[0] = 1.0f;
-    lightColor[1] = 1.0f;
-    lightColor[2] = 1.0f;
+    dirColor[0] = 0.3f;
+    dirColor[1] = 0.3f;
+    dirColor[2] = 0.3f;
 
-    lightPos[0] = 1.2f;
-    lightPos[1] = 1.0f;
-    lightPos[2] = 2.0f;
+    pointColor[0] = 1.0f;
+    pointColor[1] = 1.0f;
+    pointColor[2] = 1.0f;
+
+    spotColor[0] = 0.7f;
+    spotColor[1] = 0.0f;
+    spotColor[2] = 0.0f;
+
+    dirPos[0] = 1.2f;
+    dirPos[1] = 1.0f;
+    dirPos[2] = 2.0f;
+
+    pointPos[0] = 0.2f;
+    pointPos[1] = 0.0f;
+    pointPos[2] = 1.2f;
 
     phongConstants[0] = 0.1f;
     phongConstants[1] = 0.8f;

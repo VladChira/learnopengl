@@ -88,31 +88,48 @@ int main()
 		ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH - OPENGL_WIDTH, 3 * OPENGL_HEIGHT / 4));
 		ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-		cameraPos[0] = opengl.camera.Position.x;
-		cameraPos[1] = opengl.camera.Position.y;
-		cameraPos[2] = opengl.camera.Position.z;
-		if (ImGui::InputFloat3("Camera Position", cameraPos))
+		if (ImGui::CollapsingHeader("Camera Controls"))
 		{
-			opengl.camera.Position.x = cameraPos[0];
-			opengl.camera.Position.y = cameraPos[1];
-			opengl.camera.Position.z = cameraPos[2];
-		}
+			cameraPos[0] = opengl.camera.Position.x;
+			cameraPos[1] = opengl.camera.Position.y;
+			cameraPos[2] = opengl.camera.Position.z;
+			if (ImGui::InputFloat3("Camera Position", cameraPos))
+			{
+				opengl.camera.Position.x = cameraPos[0];
+				opengl.camera.Position.y = cameraPos[1];
+				opengl.camera.Position.z = cameraPos[2];
+			}
 
-		cameraRot[0] = opengl.camera.Pitch;
-		cameraRot[1] = opengl.camera.Yaw;
-		if (ImGui::SliderFloat2("Camera Angles", cameraRot, -90, 90))
-		{
-			opengl.camera.Pitch = cameraRot[0];
-			opengl.camera.Yaw = cameraRot[1];
-			opengl.camera.updateCameraVectors();
+			cameraRot[0] = opengl.camera.Pitch;
+			cameraRot[1] = opengl.camera.Yaw;
+			if (ImGui::SliderFloat2("Camera Angles", cameraRot, -90, 90))
+			{
+				opengl.camera.Pitch = cameraRot[0];
+				opengl.camera.Yaw = cameraRot[1];
+				opengl.camera.updateCameraVectors();
+			}
 		}
 
 		ImGui::ColorEdit3("Clear Color", opengl.clear_color);
-		ImGui::ColorEdit3("Light Color", opengl.lightColor);
-
-		ImGui::SliderFloat3("Light Position", opengl.lightPos, -2.0, 2.0);
-
 		ImGui::InputFloat4("Phong Settings", opengl.phongConstants);
+
+		if (ImGui::CollapsingHeader("Point Light Settings"))
+		{
+			ImGui::SliderFloat3("Point Light Position", opengl.pointPos, -5.0, 5.0);
+			ImGui::ColorEdit3("Point Light Color", opengl.pointColor);
+		}
+
+		if (ImGui::CollapsingHeader("Directional Light Settings"))
+		{
+			ImGui::SliderFloat3("Directional Light Direction", opengl.dirPos, -1.0, 1.0);
+			ImGui::ColorEdit3("Directional Light Color", opengl.dirColor);
+		}
+
+		if (ImGui::CollapsingHeader("Spot Light Settings"))
+		{
+			ImGui::ColorEdit3("Spot Light Color", opengl.spotColor);
+		}
+	
 		ImGui::End();
 
 		after_frame();
