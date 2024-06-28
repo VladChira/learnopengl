@@ -17,7 +17,7 @@ public:
     Camera camera;
     FrameBuffer sceneBuffer;
     float clear_color[3];
-    float cubeColor[3];
+    float lightColor[3];
     float lightPos[3];
     float phongConstants[4];
 

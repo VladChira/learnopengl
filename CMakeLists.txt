@@ -3,7 +3,7 @@ include(CMakePrintHelpers)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 project(test)
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON) 

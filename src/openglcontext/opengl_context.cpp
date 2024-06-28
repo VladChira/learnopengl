@@ -129,7 +129,7 @@ void OpenGLContext::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     cubeShader.use();
-    cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    cubeShader.setVec3("lightColor", lightColor[0], lightColor[1], lightColor[2]);
     cubeShader.setVec3("lightPos", lightPos[0], lightPos[1], lightPos[2]);
     cubeShader.setVec3("viewPos", camera.Position);
     cubeShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
@@ -156,8 +156,8 @@ void OpenGLContext::render()
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // render another
-    cubeShader.setVec3("material.ambient", cubeColor[0], cubeColor[1], cubeColor[2]);
-    cubeShader.setVec3("material.diffuse", cubeColor[0], cubeColor[1], cubeColor[2]);
+    cubeShader.setVec3("material.ambient", lightColor[0], lightColor[1], lightColor[2]);
+    cubeShader.setVec3("material.diffuse", lightColor[0], lightColor[1], lightColor[2]);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(2.0f, 0.1f, 1.8f));
     cubeShader.setMat4("model", model);
@@ -166,6 +166,7 @@ void OpenGLContext::render()
     lightShader.use();
     lightShader.setMat4("projection", projection);
     lightShader.setMat4("view", view);
+    lightShader.setVec3("lightColor", lightColor[0], lightColor[1], lightColor[2]);
 
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(lightPos[0], lightPos[1], lightPos[2]));
@@ -185,9 +186,9 @@ OpenGLContext::OpenGLContext(float w, float h) : camera(glm::vec3(0.0f, 0.0f, 3.
     clear_color[1] = 0.0f;
     clear_color[2] = 0.0f;
 
-    cubeColor[0] = 0.15f;
-    cubeColor[1] = 0.658f;
-    cubeColor[2] = 0.317f;
+    lightColor[0] = 1.0f;
+    lightColor[1] = 1.0f;
+    lightColor[2] = 1.0f;
 
     lightPos[0] = 1.2f;
     lightPos[1] = 1.0f;

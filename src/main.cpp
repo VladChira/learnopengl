@@ -21,11 +21,11 @@ void after_frame();
 GLFWwindow *window;
 ImGuiIO *io;
 ImVec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
-const int WINDOW_WIDTH = 1200;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1920;
+const int WINDOW_HEIGHT = 1080;
 
-const int OPENGL_WIDTH = 800;
-const int OPENGL_HEIGHT = 600;
+const int OPENGL_WIDTH = 1366;
+const int OPENGL_HEIGHT = 768;
 
 float cameraPos[3];
 float cameraRot[2];
@@ -108,7 +108,7 @@ int main()
 		}
 
 		ImGui::ColorEdit3("Clear Color", opengl.clear_color);
-		ImGui::ColorEdit3("Cube 1 color", opengl.cubeColor);
+		ImGui::ColorEdit3("Light Color", opengl.lightColor);
 
 		ImGui::SliderFloat3("Light Position", opengl.lightPos, -2.0, 2.0);
 
