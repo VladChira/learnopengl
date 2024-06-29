@@ -1,7 +1,7 @@
 include(FetchContent)
 include(CMakePrintHelpers)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 cmake_minimum_required(VERSION 3.5)
 project(test)
@@ -65,3 +65,6 @@ target_link_libraries(test PUBLIC GLEW)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(test PUBLIC OpenGL)
+
+find_package(assimp REQUIRED)
+target_link_libraries(test PRIVATE assimp::assimp)

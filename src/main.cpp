@@ -24,9 +24,6 @@ ImVec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
 const int WINDOW_WIDTH = 1920;
 const int WINDOW_HEIGHT = 1080;
 
-const int OPENGL_WIDTH = 1366;
-const int OPENGL_HEIGHT = 768;
-
 float cameraPos[3];
 float cameraRot[2];
 
@@ -36,27 +33,48 @@ int main()
 	if (ret != 0)
 		return -1;
 
-	OpenGLContext opengl((float)OPENGL_WIDTH, (float)OPENGL_HEIGHT);
+	OpenGLContext opengl((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 	opengl.init();
 
 	while (!glfwWindowShouldClose(window))
 	{
 		init_frame();
 
-		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSize(ImVec2(OPENGL_WIDTH, OPENGL_HEIGHT));
-		if (ImGui::Begin("OpenGL", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus))
-		{
+		int window_width, window_height;
+		glfwGetWindowSize(window, &window_width, &window_height);
 
-			opengl.sceneBuffer.RescaleFrameBuffer(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
-			glViewport(0, 0, ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::SetNextWindowSize(ImVec2(static_cast<float>(window_width), static_cast<float>(window_height)));
+		if (ImGui::Begin("OpenGL", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar))
+		{
+			ImVec2 avail = ImGui::GetContentRegionAvail();
+
+			// Define the aspect ratio of your scene
+			float aspect_ratio = 16.0f / 9.0f; // Example: 16:9 aspect ratio
+
+			// Calculate the new dimensions preserving the aspect ratio
+			float new_width = avail.x;
+			float new_height = avail.x / aspect_ratio;
+
+			if (new_height > avail.y)
+			{
+				new_height = avail.y;
+				new_width = avail.y * aspect_ratio;
+			}
+
+			// Resize the framebuffer and set the viewport
+			opengl.sceneBuffer.RescaleFrameBuffer(new_width, new_height);
+			glViewport(0, 0, new_width, new_height);
 			opengl.render();
+
+			// Draw the texture with the calculated size
 			unsigned int tex = opengl.getFrameBufferTexture();
 			ImGui::Image(
 				(ImTextureID)tex,
-				ImGui::GetContentRegionAvail(),
+				ImVec2(new_width, new_height),
 				ImVec2(0, 1),
 				ImVec2(1, 0));
+
 			if (ImGui::IsItemHovered())
 			{
 				if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -78,15 +96,15 @@ int main()
 		}
 		ImGui::End();
 
-		ImGui::SetNextWindowPos(ImVec2(OPENGL_WIDTH, 0));
-		ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH - OPENGL_WIDTH, OPENGL_HEIGHT / 4));
-		ImGui::Begin("Debug Info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
+		// ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window_width) * 0.8, static_cast<float>(window_height) * 0.05));
+		// ImGui::SetNextWindowSize(ImVec2(static_cast<float>(window_width) * 0.2, static_cast<float>(window_height) * 0.1));
+		ImGui::Begin("Debug Info", nullptr);
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
 		ImGui::End();
 
-		ImGui::SetNextWindowPos(ImVec2(OPENGL_WIDTH, OPENGL_HEIGHT / 4));
-		ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH - OPENGL_WIDTH, 3 * OPENGL_HEIGHT / 4));
-		ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
+		// ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window_width) * 0.8, static_cast<float>(window_height) * 0.15));
+		// ImGui::SetNextWindowSize(ImVec2(static_cast<float>(window_width) * 0.2, static_cast<float>(window_height) * 0.2));
+		ImGui::Begin("Controls", nullptr);
 
 		if (ImGui::CollapsingHeader("Camera Controls"))
 		{
@@ -129,7 +147,7 @@ int main()
 		{
 			ImGui::ColorEdit3("Spot Light Color", opengl.spotColor);
 		}
-	
+
 		ImGui::End();
 
 		after_frame();
@@ -167,7 +185,6 @@ int init_gui()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	if (!glfwInit())
 		return -1;
-
 
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL & ImGUI", NULL, NULL);
 
