@@ -25,10 +25,11 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 include_directories(
-	src/gui
 	src/cameras
 	src/framebuffer
 	src/openglcontext
+	src/gui
+	src/events
 )
 
 # Add the external libraries
