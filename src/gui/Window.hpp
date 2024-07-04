@@ -10,8 +10,11 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 #include "Events.hpp"
+
+#include "../renderers/OpenGlRenderer.hpp"
 
 class Window
 {
@@ -56,4 +59,6 @@ private:
     WindowData windowData;
     bool initialized = false;
     bool vsyncEnabled = true;
+
+    std::unique_ptr<OpenGlRenderer> renderer;
 };

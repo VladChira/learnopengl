@@ -1,4 +1,7 @@
 #include "Application.hpp"
+#include "Console.hpp"
+
+
 
 #include <iostream>
 
@@ -18,6 +21,8 @@ void Application::onUpdate()
 
 int Application::Start(std::string title, const unsigned int width, const unsigned int height, bool enableVsync)
 {
+    stbi_set_flip_vertically_on_load(true);
+
     this->window = std::make_unique<Window>(title, width, height, enableVsync);
 
     eventDispatcher.addEventListener<MouseMovedEvent>(
@@ -46,6 +51,10 @@ int Application::Start(std::string title, const unsigned int width, const unsign
         {
             eventDispatcher.dispatch(event);
         });
+
+
+    Console::GetInstance()->addSuccesEntry("Application loaded successfully");
+    Console::GetInstance()->addLogEntry("Bad rasterizer version 0.0.0 by Vlad Chira");
 
     while (!this->shouldClose())
     {

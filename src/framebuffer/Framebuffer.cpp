@@ -1,4 +1,4 @@
-#include "framebuffer.h"
+#include "Framebuffer.hpp"
 
 void FrameBuffer::Init(float width, float height)
 {

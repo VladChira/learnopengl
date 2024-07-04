@@ -5,7 +5,7 @@
 #include "Events.hpp"
 #include "EventDispatcher.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include <memory>
 

@@ -1,8 +1,14 @@
 #include "Window.hpp"
 
+#include "Console.hpp"
+
+#include "Panels/SceneHierarchy.hpp"
+
 #include <iostream>
 
 const char *glsl_version = "#version 130";
+
+void ConsoleLogWindow();
 
 Window::Window(std::string title, const unsigned int width, const unsigned int height, bool enableVsync)
 {
@@ -25,6 +31,8 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     std::cout << "Successfully initialzed ImGui.\n";
+
+    renderer = std::make_unique<OpenGlRenderer>(width, height);
 }
 
 Window::~Window()
@@ -46,7 +54,6 @@ void Window::onUpdate()
 
     // Draw the GUI here
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID);
-    // Set up the docking space
 
     // Set up the main dock node
     static bool first_time = true;
@@ -64,7 +71,7 @@ void Window::onUpdate()
         ImGuiID dock_main_id = dockspace_id;
         ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
         ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_main_id);
-        ImGuiID dock_bottom_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.2f, nullptr, &dock_main_id);
+        ImGuiID dock_bottom_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.3f, nullptr, &dock_main_id);
 
         // Split the left dock for Scene Hierarchy and Properties
         ImGuiID dock_left_top_id = ImGui::DockBuilderSplitNode(dock_left_id, ImGuiDir_Up, 0.5f, nullptr, &dock_left_id);
@@ -79,9 +86,11 @@ void Window::onUpdate()
         ImGui::DockBuilderDockWindow("Properties", dock_left_bottom_id);
         ImGui::DockBuilderDockWindow("Materials", dock_bottom_id);
         ImGui::DockBuilderDockWindow("Content Browser", dock_bottom_id);
+        ImGui::DockBuilderDockWindow("Console", dock_bottom_id);
         ImGui::DockBuilderDockWindow("Stats", dock_right_top_id);
         ImGui::DockBuilderDockWindow("Settings", dock_right_bottom_id);
         ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
+
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -116,7 +125,7 @@ void Window::onUpdate()
     // Scene Hierarchy and Properties windows on the left
     if (ImGui::Begin("Scene Hierarchy"))
     {
-        // Placeholder for scene hierarchy contents
+        layOutSceneHierarchy();
     }
     ImGui::End();
 
@@ -125,6 +134,11 @@ void Window::onUpdate()
         // Placeholder for properties contents
     }
     ImGui::End();
+
+    if (ImGui::Begin("Console"))
+    {
+        ConsoleLogWindow();
+    }
 
     // Materials and Content Browser at the bottom (can switch between the two)
     if (ImGui::Begin("Materials"))
@@ -142,7 +156,7 @@ void Window::onUpdate()
     // Panels on the right
     if (ImGui::Begin("Stats"))
     {
-        // Placeholder for first panel contents
+        ImGui::Text("Application average: %.1f FPS", io->Framerate);
     }
     ImGui::End();
 
@@ -154,7 +168,52 @@ void Window::onUpdate()
 
     if (ImGui::Begin("Viewport"))
     {
-        // Placeholder for second panel contents
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+
+        // Define the aspect ratio of your scene
+        float aspect_ratio = 16.0f / 9.0f;
+
+        // Calculate the new dimensions preserving the aspect ratio
+        float new_width = avail.x;
+        float new_height = avail.x / aspect_ratio;
+
+        if (new_height > avail.y)
+        {
+            new_height = avail.y;
+            new_width = avail.y * aspect_ratio;
+        }
+
+        // Resize the framebuffer and set the viewport
+        renderer->RescaleFrameBuffer(new_width, new_height);
+        glViewport(0, 0, new_width, new_height);
+        renderer->Render();
+
+        // Draw the texture with the calculated size
+        unsigned int tex = renderer->getFrameBufferTexture();
+        ImGui::Image(
+            (ImTextureID)tex,
+            ImVec2(new_width, new_height),
+            ImVec2(0, 1),
+            ImVec2(1, 0));
+
+        if (ImGui::IsItemHovered())
+        {
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(FORWARD, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(BACKWARD, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(LEFT, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(RIGHT, io->DeltaTime);
+
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            {
+                ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.1f);
+                SceneManager::GetInstance()->activeCamera->ProcessMouseMovement(mouseDelta.x, -mouseDelta.y);
+                ImGui::ResetMouseDragDelta();
+            }
+        }
     }
     ImGui::End();
 
@@ -241,4 +300,38 @@ void Window::Shutdown()
     glfwDestroyWindow(window);
     glfwTerminate();
     std::cout << "Destroying window\n";
+}
+
+void ConsoleLogWindow()
+{
+    const float bottom_space = ImGui::GetStyle().ItemSpacing.y;
+    if (ImGui::BeginChild("ScrollRegion##", ImVec2(0, -bottom_space), false, 0))
+    {
+        // Wrap items.
+        ImGui::PushTextWrapPos();
+
+        std::vector<ConsoleLine> console_entries = Console::GetInstance()->getContents();
+
+        for (int i = 0; i < console_entries.size(); i++)
+        {
+            ConsoleLine line = console_entries[i];
+            ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            if (line.entry_type == SuccesEntry)
+                color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+            if (line.entry_type == LogEntry)
+                color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            if (line.entry_type == WarningEntry)
+                color = ImVec4(1.0f, 0.75f, 0.0f, 1.0f);
+            if (line.entry_type == ErrorEntry)
+                color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+            ImGui::TextUnformatted(line.text.c_str());
+            ImGui::PopStyleColor();
+        }
+
+        // Auto-scroll logs.
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+            ImGui::SetScrollHereY(1.0f);
+    }
+    ImGui::EndChild();
 }
