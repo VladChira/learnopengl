@@ -35,6 +35,8 @@ public:
     unsigned int getWidth() const { return this->windowData.width; }
     unsigned int getHeight() const { return this->windowData.height; };
 
+    float clearColor[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+
 private:
     struct WindowData
     {
