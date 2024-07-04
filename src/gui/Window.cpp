@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+const char *glsl_version = "#version 130";
+
 Window::Window(std::string title, const unsigned int width, const unsigned int height, bool enableVsync)
 {
     this->title = title;
@@ -10,6 +12,17 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     this->initialized = false;
     this->vsyncEnabled = enableVsync;
     this->Init();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    io = &ImGui::GetIO();
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 Window::~Window()
@@ -21,13 +34,26 @@ void Window::onUpdate()
 {
     glClearColor(1, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    io->DisplaySize.x = (float)this->getWidth();
+    io->DisplaySize.y = (float)this->getHeight();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    // Draw the GUI here
+    ImGui::Begin("Test", nullptr);
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     glfwSwapBuffers(this->window);
     glfwPollEvents();
 }
 
 int Window::Init()
 {
-    const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     if (!glfwInit())
@@ -94,6 +120,11 @@ int Window::Init()
 void Window::Shutdown()
 {
     initialized = false;
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwDestroyWindow(window);
     glfwTerminate();
     std::cout << "Destroying window\n";

@@ -48,6 +48,8 @@ private:
 
     GLFWwindow *window;
 
+    ImGuiIO *io;
+
     std::string title;
     WindowData windowData;
     bool initialized = false;
