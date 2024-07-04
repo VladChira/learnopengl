@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -8,9 +11,6 @@
 
 #include "Shader.hpp"
 #include "../entities/Entity.hpp"
-
-#include <string>
-#include <vector>
 
 #define MAX_BONE_INFLUENCE 4
 

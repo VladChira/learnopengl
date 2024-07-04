@@ -22,6 +22,8 @@ public:
     unsigned int getFrameBufferTexture();
     void RescaleFrameBuffer(float width, float height);
 
+    void enableGrid(bool enable) { this->drawGrid = enable; }
+
 private:
     void initGrid();
 
@@ -29,6 +31,7 @@ private:
     FrameBuffer sceneBuffer;
 
     // Grid stuff
+    bool drawGrid;
     Shader gridShader;
     unsigned int GRID_VAO;
     unsigned int GRID_LEN;

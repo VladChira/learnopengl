@@ -1,10 +1,9 @@
 #include "Window.hpp"
 
-#include "Console.hpp"
-
-#include "Panels/SceneHierarchy.hpp"
-
 #include <iostream>
+
+#include "Console.hpp"
+#include "Panels/SceneHierarchy.hpp"
 
 const char *glsl_version = "#version 130";
 

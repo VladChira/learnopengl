@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+#include <functional>
+#include <memory>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -8,12 +12,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <string>
-#include <functional>
-#include <memory>
-
 #include "Events.hpp"
-
 #include "../renderers/OpenGlRenderer.hpp"
 
 class Window

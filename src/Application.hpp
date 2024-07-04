@@ -1,13 +1,15 @@
 #pragma once
 
+#include <memory>
+
+#include "stb_image.h"
+
 #include "Window.hpp"
 
 #include "Events.hpp"
 #include "EventDispatcher.hpp"
 
-#include "stb_image.h"
 
-#include <memory>
 
 class Application
 {

@@ -1,6 +1,6 @@
 #include "OpenGlRenderer.hpp"
-#include "../Model.hpp"
 
+#include "../Model.hpp"
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
@@ -29,7 +29,6 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     model1.Init("../models/backpack/scene.gltf");
 }
 
-
 void OpenGlRenderer::Render()
 {
     std::shared_ptr<Camera> camera = SceneManager::GetInstance()->activeCamera;
@@ -43,13 +42,16 @@ void OpenGlRenderer::Render()
     glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), this->width / this->height, 0.1f, 100.0f);
     glm::mat4 view = camera->GetViewMatrix();
 
-    gridShader.use();
-    gridShader.setMat4("projection", projection);
-    gridShader.setMat4("view", view);
-    gridShader.setMat4("model", model);
-    glBindVertexArray(GRID_VAO);
-    glDrawElements(GL_LINES, GRID_LEN, GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
+    if (drawGrid)
+    {
+        gridShader.use();
+        gridShader.setMat4("projection", projection);
+        gridShader.setMat4("view", view);
+        gridShader.setMat4("model", model);
+        glBindVertexArray(GRID_VAO);
+        glDrawElements(GL_LINES, GRID_LEN, GL_UNSIGNED_INT, NULL);
+        glBindVertexArray(0);
+    }
 
     meshShader.use();
     meshShader.setMat4("projection", projection);

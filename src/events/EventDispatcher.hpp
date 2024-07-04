@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Events.hpp"
-
 #include <functional>
 #include <array>
+
+#include "Events.hpp"
 
 class EventDispatcher
 {
