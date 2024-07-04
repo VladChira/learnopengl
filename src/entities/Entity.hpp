@@ -16,6 +16,7 @@ class Entity
 {
 public:
     Entity(EntityType type);
+    Entity(EntityType type, std::string name);
     // virtual ~Entity();
 
     void setName(std::string newName) { this->name = newName; }

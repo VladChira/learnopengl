@@ -10,6 +10,6 @@
 int main()
 {
 	Application app;
-	app.Start("Bad rasterizer", 1920, 1080, true);
+	app.Start("Bad rasterizer", 1920, 1080, false);
 	return 0;
 }

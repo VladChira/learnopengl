@@ -77,7 +77,7 @@ void Window::onUpdate()
         ImGuiID dock_left_top_id = ImGui::DockBuilderSplitNode(dock_left_id, ImGuiDir_Up, 0.5f, nullptr, &dock_left_id);
         ImGuiID dock_left_bottom_id = dock_left_id;
 
-        // Split the right dock for Panel 1 and Panel 2
+        // Split the right dock for Stats and Settings
         ImGuiID dock_right_top_id = ImGui::DockBuilderSplitNode(dock_right_id, ImGuiDir_Up, 0.5f, nullptr, &dock_right_id);
         ImGuiID dock_right_bottom_id = dock_right_id;
 

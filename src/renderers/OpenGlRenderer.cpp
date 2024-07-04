@@ -1,4 +1,6 @@
 #include "OpenGlRenderer.hpp"
+#include "../Model.hpp"
+
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
@@ -9,6 +11,8 @@ void OpenGlRenderer::RescaleFrameBuffer(float width, float height)
 {
     sceneBuffer.RescaleFrameBuffer(width, height);
 }
+
+Model model1;
 
 OpenGlRenderer::OpenGlRenderer(float width, float height)
 {
@@ -21,7 +25,10 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     this->width = width;
     this->height = height;
     sceneBuffer.Init(this->width, this->height);
+
+    model1.Init("../models/backpack/scene.gltf");
 }
+
 
 void OpenGlRenderer::Render()
 {
@@ -43,6 +50,14 @@ void OpenGlRenderer::Render()
     glBindVertexArray(GRID_VAO);
     glDrawElements(GL_LINES, GRID_LEN, GL_UNSIGNED_INT, NULL);
     glBindVertexArray(0);
+
+    meshShader.use();
+    meshShader.setMat4("projection", projection);
+    meshShader.setMat4("view", view);
+
+    model = glm::scale(model, glm::vec3(.01f, .01f, .01f));
+    meshShader.setMat4("model", model);
+    model1.Draw(meshShader);
 
     sceneBuffer.Unbind();
 }
