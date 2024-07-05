@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <memory>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -21,14 +22,13 @@
 
 #include "Mesh.hpp"
 #include "Shader.hpp"
-
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
+#include "TextureManager.hpp"
 
 class Model 
 {
 public:
     // model data 
-    std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    // std::vector<std::shared_ptr<Texture>> textures;
     std::vector<Mesh>    meshes;
     std::string directory;
     bool gammaCorrection;
@@ -91,7 +91,7 @@ private:
         // data to fill
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::vector<Texture> textures;
+        std::vector<std::shared_ptr<Texture>> textures;
 
         // walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -154,16 +154,16 @@ private:
         // normal: texture_normalN
 
         // 1. diffuse maps
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<std::shared_ptr<Texture>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<std::shared_ptr<Texture>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::SPECULAR);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        std::vector<std::shared_ptr<Texture>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, TextureType::NORMAL);
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. height maps
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        std::vector<std::shared_ptr<Texture>> heightMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, TextureType::HEIGHT);
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
         
         // return a mesh object created from the extracted mesh data
@@ -172,77 +172,42 @@ private:
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+    std::vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureType ttype)
     {
-        std::vector<Texture> textures;
+        std::vector<std::shared_ptr<Texture>> typeTextures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
             mat->GetTexture(type, i, &str);
+
+            std::string s(str.C_Str());
+            std::string filename = this->directory + "/" + s;
+
+            typeTextures.push_back(TextureManager::GetInstance()->loadTexture(filename, ttype));
+        
+
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-            bool skip = false;
-            for(unsigned int j = 0; j < textures_loaded.size(); j++)
-            {
-                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
-                {
-                    textures.push_back(textures_loaded[j]);
-                    skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
-                    break;
-                }
-            }
-            if(!skip)
-            {   // if texture hasn't been loaded already, load it
+            // bool skip = false;
+            // for(unsigned int j = 0; j < textures_loaded.size(); j++)
+            // {
+            //     if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+            //     {
+            //         textures.push_back(textures_loaded[j]);
+            //         skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+            //         break;
+            //     }
+            // }
+            // if(!skip)
+            // {   // if texture hasn't been loaded already, load it
                 
-                Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
-            }
+            //     Texture texture;
+            //     texture.id = TextureFromFile(str.C_Str(), this->directory);
+            //     texture.type = typeName;
+            //     texture.path = str.C_Str();
+            //     textures.push_back(texture);
+            //     textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+            // }
         }
-        return textures;
+        return typeTextures;
     }
 };
-
-
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
-{
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
-}
-
