@@ -1,6 +1,6 @@
 #include "OpenGlRenderer.hpp"
 
-#include "../Model.hpp"
+#include "../SceneManager.hpp"
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
@@ -11,8 +11,6 @@ void OpenGlRenderer::RescaleFrameBuffer(float width, float height)
 {
     sceneBuffer.RescaleFrameBuffer(width, height);
 }
-
-Model model1;
 
 OpenGlRenderer::OpenGlRenderer(float width, float height)
 {
@@ -26,7 +24,10 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     this->height = height;
     sceneBuffer.Init(this->width, this->height);
 
-    model1.Init("../models/backpack/scene.gltf");
+    std::shared_ptr<Model> model = std::make_shared<Model>();
+    model->setName("Backpack");
+    model->Init("../models/backpack/scene.gltf");
+    SceneManager::GetInstance()->addModel(model);
 }
 
 void OpenGlRenderer::Render()
@@ -59,7 +60,10 @@ void OpenGlRenderer::Render()
 
     model = glm::scale(model, glm::vec3(.01f, .01f, .01f));
     meshShader.setMat4("model", model);
-    model1.Draw(meshShader);
+    for (int i = 0; i < SceneManager::GetInstance()->models.size(); i++)
+    {
+        SceneManager::GetInstance()->models[i]->Draw(meshShader);
+    }
 
     sceneBuffer.Unbind();
 }

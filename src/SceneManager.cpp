@@ -2,6 +2,38 @@
 
 SceneManager *SceneManager::sm_instance{nullptr};
 
+void SceneManager::addMesh(std::shared_ptr<Mesh> newMesh)
+{
+    // First, check if we don't already have this mesh included
+    for (int i = 0; i < meshes.size(); i++)
+        if (meshes[i]->getUUID() == newMesh->getUUID())
+            return;
+
+    meshes.push_back(newMesh);
+    entities.push_back(newMesh);
+}
+
+void SceneManager::addModel(std::shared_ptr<Model> newModel)
+{
+    // First, check if we don't already have this model included
+    for (int i = 0; i < models.size(); i++)
+        if (models[i]->getUUID() == newModel->getUUID())
+            return;
+
+    models.push_back(newModel);
+    entities.push_back(newModel);
+}
+
+void SceneManager::addCamera(std::shared_ptr<Camera> newCamera)
+{
+    // First, check if we don't already have this camera included
+    for (int i = 0; i < cameras.size(); i++)
+        if (cameras[i]->getUUID() == newCamera->getUUID())
+            return;
+
+    cameras.push_back(newCamera);
+    entities.push_back(newCamera);
+}
 
 std::shared_ptr<Entity> SceneManager::getEntityByID(std::string UUID)
 {
@@ -25,7 +57,7 @@ SceneManager::SceneManager()
     // A scene always has at least one camera
     std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
     camera->setName("Default Camera");
-    this->entities.push_back(camera);
+    addCamera(camera);
     this->activeCamera = camera;
 
     // Set the clear color to black by default

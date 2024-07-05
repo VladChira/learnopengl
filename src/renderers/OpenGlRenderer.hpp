@@ -12,7 +12,6 @@
 #include "Console.hpp"
 #include "../framebuffer/Framebuffer.hpp"
 #include "../Shader.hpp"
-#include "../SceneManager.hpp"
 
 class OpenGlRenderer
 {
@@ -31,7 +30,7 @@ private:
     FrameBuffer sceneBuffer;
 
     // Grid stuff
-    bool drawGrid;
+    bool drawGrid = true;
     Shader gridShader;
     unsigned int GRID_VAO;
     unsigned int GRID_LEN;

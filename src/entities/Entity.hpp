@@ -7,6 +7,7 @@
 enum class EntityType
 {
     NullObject,
+    Model,
     Mesh,
     Light,
     Camera
@@ -40,6 +41,8 @@ public:
             return "Light";
         case EntityType::Camera:
             return "Camera";
+        case EntityType::Model:
+            return "Model";
         default:
             return "[Unknown Type]";
         }

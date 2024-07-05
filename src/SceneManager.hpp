@@ -7,6 +7,8 @@
 
 #include "../entities/Entity.hpp"
 #include "../cameras/Camera.hpp"
+#include "Mesh.hpp"
+#include "Model.hpp"
 
 class SceneManager
 {
@@ -19,6 +21,10 @@ public:
     std::shared_ptr<Entity> getEntityByIndex(unsigned int index);
     unsigned int getEntityCount() { return entities.size(); }
 
+    void addMesh(std::shared_ptr<Mesh> newMesh);
+    void addModel(std::shared_ptr<Model> newModel);
+    void addCamera(std::shared_ptr<Camera> newCamera);
+
     static SceneManager *GetInstance();
     static void DestroyInstance();
 
@@ -28,6 +34,10 @@ public:
 
     float bgColor[4];
     std::shared_ptr<Camera> activeCamera;
+
+    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Model>> models;
+    std::vector<std::shared_ptr<Camera>> cameras;
 
 private:
     std::vector<std::shared_ptr<Entity>> entities;
