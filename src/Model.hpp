@@ -29,7 +29,7 @@ class Model : public Entity
 {
 public:
     // model data
-    std::vector<Mesh> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
     std::string directory;
     bool gammaCorrection;
 
@@ -44,7 +44,7 @@ public:
     void Draw(Shader &shader)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
-            meshes[i].Draw(shader);
+            meshes[i]->Draw(shader);
     }
 
 private:
@@ -53,7 +53,7 @@ private:
     {
         // read file via ASSIMP
         Assimp::Importer importer;
-        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace | aiProcess_PreTransformVertices);
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
         // check for errors
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
@@ -64,28 +64,46 @@ private:
         directory = path.substr(0, path.find_last_of('/'));
 
         // process ASSIMP's root node recursively
-        processNode(scene->mRootNode, scene);
+        processNode(this, scene->mRootNode, glm::mat4(1), scene);
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-    void processNode(aiNode *node, const aiScene *scene)
+    void processNode(Entity *entityNode, aiNode *node, glm::mat4 mat, const aiScene *scene)
     {
+        auto m = node->mTransformation;
+        mat = glm::mat4(
+                  m.a1, m.a2, m.a3, m.a4,
+                  m.b1, m.b2, m.b3, m.b4,
+                  m.c1, m.c2, m.c3, m.c4,
+                  m.d1, m.d2, m.d3, m.d4) *
+              mat;
+
         // process each mesh located at the current node
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             // the node object only contains indices to index the actual objects in the scene.
             // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
+            std::string name = std::string(mesh->mName.C_Str());
+
+            std::shared_ptr<Mesh> meshChild = processMesh(mesh, mat, scene);
+            meshChild->setName(name);
+            meshes.push_back(meshChild);
+
+            entityNode->getChildren().push_back(meshChild);
         }
         // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            processNode(node->mChildren[i], scene);
+            std::shared_ptr<Entity> nullChild = std::make_shared<Entity>(EntityType::NullObject);
+            std::string name = std::string(node->mChildren[i]->mName.C_Str());
+            nullChild->setName(name);
+            entityNode->getChildren().push_back(nullChild);
+            processNode(nullChild.get(), node->mChildren[i], mat, scene);
         }
     }
 
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+    std::shared_ptr<Mesh> processMesh(aiMesh *mesh, glm::mat4 mat, const aiScene *scene)
     {
         // data to fill
         std::vector<Vertex> vertices;
@@ -101,7 +119,7 @@ private:
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
-            vertex.Position = vector;
+            vertex.Position = glm::vec4(vector, 1) * mat;
             // normals
             if (mesh->HasNormals())
             {
@@ -166,7 +184,7 @@ private:
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
+        return std::make_shared<Mesh>(vertices, indices, textures);
     }
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.

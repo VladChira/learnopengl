@@ -4,6 +4,8 @@
 #include <sstream>
 #include <memory>
 
+#include "glm/glm.hpp"
+
 enum class EntityType
 {
     NullObject,
@@ -23,7 +25,7 @@ public:
     void setName(std::string newName) { this->name = newName; }
     std::string getName() { return this->name; };
 
-    std::vector<std::shared_ptr<Entity>> getChildren() { return children; }
+    std::vector<std::shared_ptr<Entity>> &getChildren() { return children; }
 
     EntityType getType() { return type; }
 
@@ -52,6 +54,10 @@ private:
     std::string name;
     std::string UUID;
     EntityType type;
+
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
 
     std::vector<std::shared_ptr<Entity>> children;
 

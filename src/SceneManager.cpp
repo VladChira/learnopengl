@@ -55,7 +55,7 @@ std::shared_ptr<Entity> SceneManager::getEntityByIndex(unsigned int index)
 SceneManager::SceneManager()
 {
     // A scene always has at least one camera
-    std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+    std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(5.61f, 1.55f, 5.04), glm::vec3(0.0f, 1.0f, 0.0f), -136.9f, -12.6f);
     camera->setName("Default Camera");
     addCamera(camera);
     this->activeCamera = camera;
