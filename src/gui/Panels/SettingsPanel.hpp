@@ -27,9 +27,9 @@ void rasterizerSettings(OpenGlRenderer *renderer)
         ImGui::SameLine();
         if (ImGui::Button("Viewport Mode"))
         {
-            SceneManager::GetInstance()->bgColor[0] = 0.195f;
-            SceneManager::GetInstance()->bgColor[1] = 0.20f;
-            SceneManager::GetInstance()->bgColor[2] = 0.21f;
+            SceneManager::GetInstance()->bgColor[0] = 0.125f;
+            SceneManager::GetInstance()->bgColor[1] = 0.125f;
+            SceneManager::GetInstance()->bgColor[2] = 0.125f;
             renderer->drawGrid = true;
             renderer->drawLightGizmos = true;
         }

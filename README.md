@@ -1,6 +1,6 @@
 # Stuff I make while learning to write a PBR rasterizer in OpenGL
 
-<p align="center"><img src="images/v0.0.2.png" width="700"/></p>
+<p align="center"><img src="images/v0.0.3.png" width="700"/></p>
 <p align="center">Current interface with a backpack model, a simple cube and a point light</p>
 
 ## Roadmap:
@@ -34,6 +34,9 @@ Dependencies (so far):
 - Assimp library
 
 ## Previous versions
+
+<p align="center"><img src="images/v0.0.2.png" width="700"/></p>
+<p align="center">v0.0.2 with a backpack model, a simple cube and a point light</p>
 
 <p align="center"><img src="images/v0.0.1.png" width="700"/></p>
 <p align="center">v0.0.1 interface with a backpack model and no lighting</p>
