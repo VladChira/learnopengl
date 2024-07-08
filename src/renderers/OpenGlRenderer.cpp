@@ -55,6 +55,16 @@ void OpenGlRenderer::Render()
     }
 
     meshShader.use();
+
+    meshShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
+    meshShader.setVec3("dirLight.color", 1.0f, 1.0f, 1.0f);
+
+    meshShader.setVec3("pointLights[0].position", glm::vec3(0.2f, 0.0f, 1.5f));
+    meshShader.setVec3("pointLights[0].color", 1.3f, 1.3f, 1.3f);
+    meshShader.setFloat("pointLights[0].constant", 1.0f);
+    meshShader.setFloat("pointLights[0].linear", 0.09f);
+    meshShader.setFloat("pointLights[0].quadratic", 0.032f);
+
     meshShader.setMat4("projection", projection);
     meshShader.setMat4("view", view);
 

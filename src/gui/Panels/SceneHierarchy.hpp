@@ -23,7 +23,6 @@ void displayNode(std::shared_ptr<Entity> entity)
         {
             displayNode(entity->getChildren()[i]);
         }
-
         ImGui::TreePop();
     }
 }

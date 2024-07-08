@@ -40,9 +40,9 @@ public:
     static TextureManager *GetInstance();
     static void DestroyInstance();
 
-private:
     std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 
+private:
     static TextureManager *tm_instance;
 
     unsigned int TextureFromFile(std::string filename, bool gamma)

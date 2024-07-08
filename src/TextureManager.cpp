@@ -29,7 +29,7 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
-    DestroyInstance();
+    
 }
 
 TextureManager *TextureManager::GetInstance()

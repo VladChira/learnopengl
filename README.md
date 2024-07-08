@@ -15,11 +15,20 @@ Roadmap:
 - 3D move/rotate/scale gizmos
 - Anti-aliasing
 - Face culling, depth testing
-- Better GLSL (better grid shader)
+- Better GLSL
 - Shadows
 - Normal maps
 - HDR
 - Ambient Occlusion
 - PBR workflow!
+- HDRI lighting
+- Node graph-based material system
+- Great ImGUI UI: Asset Manager, Icons, Render Settings Panel, Image Export
 - Ray tracing?
 - Compute shaders?
+
+Dependencies (so far):
+- OpenGL w/ GLEW & GLFW
+- Dear ImGUI - docking branch
+- stb_image.h
+- Assimp library

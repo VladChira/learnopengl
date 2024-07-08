@@ -1,10 +1,10 @@
 include(FetchContent)
 include(CMakePrintHelpers)
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 cmake_minimum_required(VERSION 3.5)
-project(test)
+project(rasterizer)
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON) 
 
@@ -39,7 +39,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/imgui)
 set(SRCS ${SRC_FILES})
 
 # Add the executable
-add_executable(test ${SRCS})
+add_executable(rasterizer ${SRCS})
 
 include(FetchContent)
 
@@ -53,19 +53,18 @@ FetchContent_MakeAvailable(glm)
 
 # Link external libraries
 
-target_link_libraries(test PRIVATE glm::glm)
+target_link_libraries(rasterizer PRIVATE glm::glm)
 
-target_link_libraries(test PRIVATE imgui)
-target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/external/tinyobjloader)
+target_link_libraries(rasterizer PRIVATE imgui)
 
 find_package(glfw3 REQUIRED)
-target_link_libraries(test PUBLIC glfw)
+target_link_libraries(rasterizer PUBLIC glfw)
 
 find_package(GLEW REQUIRED)
-target_link_libraries(test PUBLIC GLEW)
+target_link_libraries(rasterizer PUBLIC GLEW)
 
 find_package(OpenGL REQUIRED)
-target_link_libraries(test PUBLIC OpenGL)
+target_link_libraries(rasterizer PUBLIC OpenGL)
 
 find_package(assimp REQUIRED)
-target_link_libraries(test PRIVATE assimp::assimp)
+target_link_libraries(rasterizer PRIVATE assimp::assimp)

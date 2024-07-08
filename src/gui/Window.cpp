@@ -97,32 +97,31 @@ void Window::onUpdate()
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
-    ImGuiWindowFlags menu_bar_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
-    if (ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("File"))
-        {
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit"))
-        {
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Assets"))
-        {
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Window"))
-        {
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Help"))
-        {
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-    ImGui::EndMainMenuBar();
+    // ImGuiWindowFlags menu_bar_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+    // if (ImGui::BeginMainMenuBar())
+    // {
+    //     if (ImGui::BeginMenu("File"))
+    //     {
+    //         ImGui::EndMenu();
+    //     }
+    //     if (ImGui::BeginMenu("Edit"))
+    //     {
+    //         ImGui::EndMenu();
+    //     }
+    //     if (ImGui::BeginMenu("Assets"))
+    //     {
+    //         ImGui::EndMenu();
+    //     }
+    //     if (ImGui::BeginMenu("Window"))
+    //     {
+    //         ImGui::EndMenu();
+    //     }
+    //     if (ImGui::BeginMenu("Help"))
+    //     {
+    //         ImGui::EndMenu();
+    //     }
+    // }
+    // ImGui::EndMainMenuBar();
 
     ImGuiWindowClass c;
     c.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
@@ -148,6 +147,7 @@ void Window::onUpdate()
     {
         ConsoleLogWindow();
     }
+    ImGui::End();
 
     if (ImGui::Begin("Materials"))
     {
@@ -197,7 +197,6 @@ void Window::onUpdate()
         if (ImGui::IsItemHovered() && io->MouseDown[0])
         {
             auto pos = SceneManager::GetInstance()->activeCamera;
-            std::cout << pos->Pitch << " " << pos->Yaw << " " << "\n";
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
                 SceneManager::GetInstance()->activeCamera->ProcessKeyboard(FORWARD, io->DeltaTime);
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
