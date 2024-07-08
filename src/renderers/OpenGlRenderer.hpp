@@ -25,6 +25,7 @@ public:
 
 private:
     void initGrid();
+    void initPointLightMarker();
 
     float width, height;
     FrameBuffer sceneBuffer;
@@ -34,6 +35,10 @@ private:
     Shader gridShader;
     unsigned int GRID_VAO;
     unsigned int GRID_LEN;
+
+    // Point Light marker stuff
+    Shader pointLightMarker;
+    unsigned int pointLightMarker_VAO;
 
     // Mesh shaders
     Shader meshShader;

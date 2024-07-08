@@ -8,7 +8,7 @@ Entity::Entity(EntityType type)
     this->name = UUID;
     this->type = type;
 
-    Console::GetInstance()->addSuccesEntry("Created new entity of type " + TypeToString(type) +  "  [" + UUID + "]");
+    Console::GetInstance()->addLogEntry("Created new entity of type " + TypeToString(type) +  "  [" + UUID + "]");
 }
 
 Entity::Entity(EntityType type, std::string name)
@@ -17,5 +17,5 @@ Entity::Entity(EntityType type, std::string name)
     this->name = name;
     this->type = type;
 
-    Console::GetInstance()->addSuccesEntry("Created new entity of type " + TypeToString(type) +  "  [" + UUID + "]");
+    Console::GetInstance()->addLogEntry("Created new entity of type " + TypeToString(type) +  "  [" + UUID + "]");
 }

@@ -11,6 +11,7 @@ enum class EntityType
     NullObject,
     Model,
     Mesh,
+    Primitive,
     Light,
     Camera
 };
@@ -45,6 +46,8 @@ public:
             return "Camera";
         case EntityType::Model:
             return "Model";
+        case EntityType::Primitive:
+            return "Primitive";
         default:
             return "[Unknown Type]";
         }

@@ -1,9 +1,9 @@
-## Stuff I make while learning to write a PBR rasterizer in OpenGL
+# Stuff I make while learning to write a PBR rasterizer in OpenGL
 
-<p align="center"><img src="images/v0.1.1.png" width="700"/></p>
-<p align="center">Current interface with a backpack model and no lighting</p>
+<p align="center"><img src="images/v0.0.2.png" width="700"/></p>
+<p align="center">Current interface with a backpack model, a simple cube and a point light</p>
 
-Roadmap:
+## Roadmap:
 - ~~Basic OpenGl stuff: VAOs, VBOs, shaders, textures~~
 - ~~Phong materials~~
 - ~~Basic lighting: ambient lights, directional lights, point lights, spot lights~~
@@ -32,3 +32,8 @@ Dependencies (so far):
 - Dear ImGUI - docking branch
 - stb_image.h
 - Assimp library
+
+## Previous versions
+
+<p align="center"><img src="images/v0.0.1.png" width="700"/></p>
+<p align="center">v0.0.1 interface with a backpack model and no lighting</p>

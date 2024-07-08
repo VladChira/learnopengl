@@ -9,6 +9,7 @@
 #include "../cameras/Camera.hpp"
 #include "Mesh.hpp"
 #include "Model.hpp"
+#include "../entities/Primitive.hpp"
 
 class SceneManager
 {
@@ -24,6 +25,7 @@ public:
     void addMesh(std::shared_ptr<Mesh> newMesh);
     void addModel(std::shared_ptr<Model> newModel);
     void addCamera(std::shared_ptr<Camera> newCamera);
+    void addPrimitive(std::shared_ptr<Primitive> newPrimitive);
 
     static SceneManager *GetInstance();
     static void DestroyInstance();
@@ -38,6 +40,8 @@ public:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<std::shared_ptr<Model>> models;
     std::vector<std::shared_ptr<Camera>> cameras;
+
+    std::vector<std::shared_ptr<Primitive>> primitives;
 
 private:
     std::vector<std::shared_ptr<Entity>> entities;
