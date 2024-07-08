@@ -4,6 +4,8 @@
 
 #include "Console.hpp"
 #include "Panels/SceneHierarchy.hpp"
+#include "Panels/PropertiesPanel.hpp"
+#include "Panels/SettingsPanel.hpp"
 
 const char *glsl_version = "#version 130";
 
@@ -27,6 +29,7 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io->Fonts->AddFontFromFileTTF("../fonts/DMSans-Regular.ttf", 18.0);
 
     // ImGui::StyleColorsDark();
     embraceTheDarkness();
@@ -97,31 +100,31 @@ void Window::onUpdate()
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
-    // ImGuiWindowFlags menu_bar_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
-    // if (ImGui::BeginMainMenuBar())
-    // {
-    //     if (ImGui::BeginMenu("File"))
-    //     {
-    //         ImGui::EndMenu();
-    //     }
-    //     if (ImGui::BeginMenu("Edit"))
-    //     {
-    //         ImGui::EndMenu();
-    //     }
-    //     if (ImGui::BeginMenu("Assets"))
-    //     {
-    //         ImGui::EndMenu();
-    //     }
-    //     if (ImGui::BeginMenu("Window"))
-    //     {
-    //         ImGui::EndMenu();
-    //     }
-    //     if (ImGui::BeginMenu("Help"))
-    //     {
-    //         ImGui::EndMenu();
-    //     }
-    // }
-    // ImGui::EndMainMenuBar();
+    ImGuiWindowFlags menu_bar_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit"))
+        {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Assets"))
+        {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Window"))
+        {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help"))
+        {
+            ImGui::EndMenu();
+        }
+    }
+    ImGui::EndMainMenuBar();
 
     ImGuiWindowClass c;
     c.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
@@ -140,6 +143,7 @@ void Window::onUpdate()
 
     if (ImGui::Begin("Properties"))
     {
+        displayPropertiesOfEntity(SceneManager::GetInstance()->selectedEntity);
     }
     ImGui::End();
 
@@ -161,6 +165,7 @@ void Window::onUpdate()
 
     if (ImGui::Begin("Settings"))
     {
+        rasterizerSettings(renderer.get());
     }
     ImGui::End();
 

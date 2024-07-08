@@ -43,6 +43,8 @@ public:
 
     std::vector<std::shared_ptr<Primitive>> primitives;
 
+    std::shared_ptr<Entity> selectedEntity;
+
 private:
     std::vector<std::shared_ptr<Entity>> entities;
 

@@ -23,6 +23,9 @@ public:
 
     void enableGrid(bool enable) { this->drawGrid = enable; }
 
+    bool drawGrid = true;
+    bool drawLightGizmos = true;
+
 private:
     void initGrid();
     void initPointLightMarker();
@@ -31,7 +34,7 @@ private:
     FrameBuffer sceneBuffer;
 
     // Grid stuff
-    bool drawGrid = true;
+
     Shader gridShader;
     unsigned int GRID_VAO;
     unsigned int GRID_LEN;

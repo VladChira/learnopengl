@@ -52,16 +52,19 @@ void OpenGlRenderer::Render()
     glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), this->width / this->height, 0.1f, 100.0f);
     glm::mat4 view = camera->GetViewMatrix();
 
-    pointLightMarker.use();
-    model = glm::translate(model, glm::vec3(0.2f, 0.0f, 2.5f));
-    pointLightMarker.setMat4("projection", projection);
-    pointLightMarker.setMat4("view", view);
-    pointLightMarker.setMat4("model", model);
-    glBindVertexArray(pointLightMarker_VAO);
-    glLineWidth(2.0f);
-    glDrawArrays(GL_LINES, 0, 24);
-    glBindVertexArray(0);
-    model = glm::mat4(1.0f);
+    if (drawLightGizmos)
+    {
+        pointLightMarker.use();
+        model = glm::translate(model, glm::vec3(0.2f, 0.0f, 2.5f));
+        pointLightMarker.setMat4("projection", projection);
+        pointLightMarker.setMat4("view", view);
+        pointLightMarker.setMat4("model", model);
+        glBindVertexArray(pointLightMarker_VAO);
+        glLineWidth(2.0f);
+        glDrawArrays(GL_LINES, 0, 24);
+        glBindVertexArray(0);
+        model = glm::mat4(1.0f);
+    }
 
     if (drawGrid)
     {
@@ -110,32 +113,67 @@ void OpenGlRenderer::initPointLightMarker()
 {
     GLfloat markerVertices[] = {
         // X-axis lines
-        -0.5f, 0.0f, 0.0f,  0.5f, 0.0f, 0.0f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        0.5f,
+        0.0f,
+        0.0f,
         // Y-axis lines
-        0.0f, -0.5f, 0.0f,  0.0f, 0.5f, 0.0f,
+        0.0f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        0.5f,
+        0.0f,
         // Z-axis lines
-        0.0f, 0.0f, -0.5f,  0.0f, 0.0f, 0.5f,
+        0.0f,
+        0.0f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        0.5f,
         // Additional lines
-        0.5f, 0.5f, 0.0f,  -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,  -0.5f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f,  -0.5f, 0.0f, -0.5f,
-        0.0f, 0.5f, 0.5f,  0.0f, -0.5f, -0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.5f,
+        0.0f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        -0.5f,
+        0.0f,
+        0.5f,
+        0.5f,
+        0.0f,
+        -0.5f,
+        -0.5f,
     };
     unsigned int VBO;
 
     // Generate and bind VAO and VBO
     glGenVertexArrays(1, &pointLightMarker_VAO);
     glGenBuffers(1, &VBO);
-    
+
     glBindVertexArray(pointLightMarker_VAO);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(markerVertices), markerVertices, GL_STATIC_DRAW);
-    
+
     // Specify vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(0);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

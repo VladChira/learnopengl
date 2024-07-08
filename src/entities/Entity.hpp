@@ -32,7 +32,7 @@ public:
 
     std::string getUUID() { return UUID; }
 
-    static inline std::string TypeToString(EntityType et)
+    static inline std::string EntityTypeToString(EntityType et)
     {
         switch (et)
         {

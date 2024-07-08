@@ -72,10 +72,13 @@ SceneManager::SceneManager()
     this->activeCamera = camera;
 
     // Set the clear color to black by default
-    bgColor[0] = 0.0f;
-    bgColor[1] = 0.0f;
-    bgColor[2] = 0.0f;
+    bgColor[0] = 0.195f;
+    bgColor[1] = 0.20f;
+    bgColor[2] = 0.21f;
     bgColor[3] = 1.0f;
+
+    // Nothing is selected at first
+    selectedEntity = nullptr;
 }
 
 SceneManager::~SceneManager()

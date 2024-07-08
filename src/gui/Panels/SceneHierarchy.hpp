@@ -11,17 +11,24 @@
 #include "../../entities/Entity.hpp"
 #include "../../SceneManager.hpp"
 
-void displayNode(std::shared_ptr<Entity> entity)
+void displayNode(std::shared_ptr<Entity> currentEntity, std::shared_ptr<Entity> selectedEntity)
 {
-    int noChildren = entity->getChildren().size();
-    ImGuiTreeNodeFlags flags = 0;
+    int noChildren = currentEntity->getChildren().size();
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
     if (noChildren == 0)
         flags |= ImGuiTreeNodeFlags_Leaf;
-    if (ImGui::TreeNodeEx(entity->getName().c_str(), flags))
+
+    if (selectedEntity != nullptr && currentEntity->getUUID() == selectedEntity->getUUID())
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    bool node_open = ImGui::TreeNodeEx(currentEntity->getName().c_str(), flags);
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+        SceneManager::GetInstance()->selectedEntity = currentEntity;
+    if (node_open)
     {
         for (int i = 0; i < noChildren; i++)
         {
-            displayNode(entity->getChildren()[i]);
+            displayNode(currentEntity->getChildren()[i], selectedEntity);
         }
         ImGui::TreePop();
     }
@@ -31,6 +38,7 @@ void layOutSceneHierarchy()
 {
     for (int i = 0; i < SceneManager::GetInstance()->getEntityCount(); i++)
     {
-        displayNode(SceneManager::GetInstance()->getEntityByIndex(i));
+        auto selectedEntity = SceneManager::GetInstance()->selectedEntity;
+        displayNode(SceneManager::GetInstance()->getEntityByIndex(i), selectedEntity);
     }
 }
