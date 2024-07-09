@@ -3,6 +3,7 @@
 #include "../SceneManager.hpp"
 
 #include "../entities/CubePrimitive.hpp"
+#include "../lights/PointLight.hpp"
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
@@ -37,6 +38,10 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     std::shared_ptr<CubePrimitive> cube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
     cube->setName("Test Cube");
     SceneManager::GetInstance()->addPrimitive(cube);
+
+    std::shared_ptr<PointLight> light = std::make_shared<PointLight>();
+    light->setName("Default Point Light");
+    SceneManager::GetInstance()->addLight(light);
 }
 
 void OpenGlRenderer::Render()
@@ -58,12 +63,28 @@ void OpenGlRenderer::Render()
         model = glm::translate(model, glm::vec3(0.2f, 0.0f, 2.5f));
         pointLightMarker.setMat4("projection", projection);
         pointLightMarker.setMat4("view", view);
-        pointLightMarker.setMat4("model", model);
-        glBindVertexArray(pointLightMarker_VAO);
-        glLineWidth(2.0f);
-        glDrawArrays(GL_LINES, 0, 24);
-        glBindVertexArray(0);
-        model = glm::mat4(1.0f);
+
+        for (int i = 0; i < SceneManager::GetInstance()->lights.size(); i++)
+        {
+            auto light = SceneManager::GetInstance()->lights[i];
+            pointLightMarker.setMat4("model", light->getModelMatrix());
+
+            if (light->getType() == LightType::PointLight)
+            {
+                PointLight *pLight = dynamic_cast<PointLight *>(light.get());
+                pointLightMarker.setVec3("markerColor", pLight->lightColor[0], pLight->lightColor[1], pLight->lightColor[2]);
+            }
+            else
+            {
+                pointLightMarker.setVec3("markerColor", 1.0, 1.0, 1.0);
+            }
+
+            glBindVertexArray(pointLightMarker_VAO);
+            glLineWidth(2.0f);
+            glDrawArrays(GL_LINES, 0, 24);
+            glBindVertexArray(0);
+            model = glm::mat4(1.0f);
+        }
     }
 
     if (drawGrid)
@@ -79,31 +100,32 @@ void OpenGlRenderer::Render()
 
     meshShader.use();
 
-    meshShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
-    meshShader.setVec3("dirLight.color", 1.0f, 1.0f, 1.0f);
-
-    meshShader.setVec3("pointLights[0].position", glm::vec3(0.2f, 0.0f, 2.5f));
-    meshShader.setVec3("pointLights[0].color", 1.3f, 1.3f, 1.3f);
-    meshShader.setFloat("pointLights[0].constant", 1.0f);
-    meshShader.setFloat("pointLights[0].linear", 0.09f);
-    meshShader.setFloat("pointLights[0].quadratic", 0.032f);
+    // meshShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
+    // meshShader.setVec3("dirLight.color", 1.0f, 1.0f, 1.0f);
+    meshShader.setInt("numPointLights", SceneManager::GetInstance()->nrOfPointLights);
+    meshShader.setInt("numDirLights", SceneManager::GetInstance()->nrOfPointLights);
+    meshShader.setInt("numSpotLights", SceneManager::GetInstance()->nrOfSpotLights);
+    for (int i = 0; i < SceneManager::GetInstance()->lights.size(); i++)
+    {
+        auto light = SceneManager::GetInstance()->lights[i];
+        light->setUniforms(meshShader, i);
+    }
 
     meshShader.setMat4("projection", projection);
     meshShader.setMat4("view", view);
 
-    model = glm::scale(model, glm::vec3(.01f, .01f, .01f));
-    meshShader.setMat4("model", model);
     for (int i = 0; i < SceneManager::GetInstance()->models.size(); i++)
     {
-        SceneManager::GetInstance()->models[i]->Draw(meshShader);
+        auto model = SceneManager::GetInstance()->models[i];
+        meshShader.setMat4("model", model->getModelMatrix());
+        model->Draw(meshShader);
     }
 
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.2f, 0.0f, -3.5f));
-    meshShader.setMat4("model", model);
     for (int i = 0; i < SceneManager::GetInstance()->primitives.size(); i++)
     {
-        SceneManager::GetInstance()->primitives[i]->Draw(meshShader);
+        auto primitive = SceneManager::GetInstance()->primitives[i];
+        meshShader.setMat4("model", primitive->getModelMatrix());
+        primitive->Draw(meshShader);
     }
 
     sceneBuffer.Unbind();

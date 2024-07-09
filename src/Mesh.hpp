@@ -61,6 +61,11 @@ public:
         material->diffuseMap = TextureManager().GetInstance()->loadTexture("../models/backpack/textures/Scene_-_Root_baseColor.jpeg", TextureType::DIFFUSE);
     }
 
+    ~Mesh()
+    {
+        
+    }
+
     // render the mesh
     void Draw(Shader &shader)
     {

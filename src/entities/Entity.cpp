@@ -9,6 +9,13 @@ Entity::Entity(EntityType type)
     this->type = type;
 
     Console::GetInstance()->addLogEntry("Created new entity of type " + EntityTypeToString(type) +  "  [" + UUID + "]");
+
+    resetTransform();
+}
+
+Entity::~Entity()
+{
+
 }
 
 Entity::Entity(EntityType type, std::string name)

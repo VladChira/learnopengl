@@ -37,13 +37,39 @@ void SceneManager::addCamera(std::shared_ptr<Camera> newCamera)
 
 void SceneManager::addPrimitive(std::shared_ptr<Primitive> newPrimitive)
 {
-    // First, check if we don't already have this camera included
+    // First, check if we don't already have this primitive included
     for (int i = 0; i < primitives.size(); i++)
         if (primitives[i]->getUUID() == newPrimitive->getUUID())
             return;
 
     primitives.push_back(newPrimitive);
     entities.push_back(newPrimitive);
+}
+
+void SceneManager::addLight(std::shared_ptr<Light> newLight)
+{
+    // First, check if we don't already have this light included
+    for (int i = 0; i < lights.size(); i++)
+        if (lights[i]->getUUID() == newLight->getUUID())
+            return;
+
+    lights.push_back(newLight);
+    entities.push_back(newLight);
+
+    switch (newLight->getType())
+    {
+    case LightType::PointLight:
+        nrOfPointLights++;
+        break;
+    case LightType::DirectionalLight:
+        nrOfDirLights++;
+        break;
+    case LightType::SpotLight:
+        nrOfSpotLights++;
+        break;
+    default:
+        break;
+    }
 }
 
 std::shared_ptr<Entity> SceneManager::getEntityByID(std::string UUID)

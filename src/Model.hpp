@@ -35,9 +35,14 @@ public:
 
     Model() : Entity(EntityType::Model) {}
 
+    ~Model()
+    {
+    }
+
     void Init(std::string const &path)
     {
         loadModel(path);
+        resetTransform();
     }
 
     // draws the model, and thus all its meshes
@@ -114,7 +119,7 @@ private:
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
-            glm::vec3 vector; 
+            glm::vec3 vector;
             // positions
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;

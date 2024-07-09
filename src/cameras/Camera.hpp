@@ -61,6 +61,10 @@ public:
         updateCameraVectors();
     }
 
+    ~Camera()
+    {
+    }
+
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
