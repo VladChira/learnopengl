@@ -4,6 +4,8 @@
 #include <memory>
 #include <iostream>
 
+#include "ImGuizmo.h"
+
 #include "../Shader.hpp"
 #include "../entities/Entity.hpp"
 
@@ -37,8 +39,6 @@ public:
             return "[Unknown Type]";
         }
     }
-
-
 
     virtual void setUniforms(Shader &shader, int indexOfLight) = 0;
 

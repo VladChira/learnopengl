@@ -12,6 +12,7 @@
 #include "../../entities/Entity.hpp"
 #include "../../SceneManager.hpp"
 #include "../../lights/PointLight.hpp"
+#include "../../lights/DirectionalLight.hpp"
 
 void displayBaseEntityProperties(std::shared_ptr<Entity> entity);
 void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent);
@@ -78,44 +79,49 @@ void displayBaseEntityProperties(std::shared_ptr<Entity> entity)
             ImU32 green_bg_color = ImGui::GetColorU32(ImVec4(0.16f, 0.83f, 0.02f, 1.0f));
             ImU32 blue_bg_color = ImGui::GetColorU32(ImVec4(0.01f, 0.29f, 0.878f, 1.0f));
 
+            float position[3], rotation[3], scale[3];
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(entity->transform), position, rotation, scale);
+
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, 14288647);
             ImGui::TableNextColumn();
             ImGui::Text("Position");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, red_bg_color);
-            ImGui::DragFloat("##posX", &(entity->position[0]), 0.01f, 0.0f, 0.0f, "X: %.2f");
+            ImGui::DragFloat("##posX", &position[0], 0.01f, 0.0f, 0.0f, "X: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, green_bg_color);
-            ImGui::DragFloat("##posY", &(entity->position[1]), 0.01f, 0.0f, 0.0f, "Y: %.2f");
+            ImGui::DragFloat("##posY", &position[1], 0.01f, 0.0f, 0.0f, "Y: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, blue_bg_color);
-            ImGui::DragFloat("##posZ", &(entity->position[2]), 0.01f, 0.0f, 0.0f, "Z: %.2f");
+            ImGui::DragFloat("##posZ", &position[2], 0.01f, 0.0f, 0.0f, "Z: %.2f");
 
             ImGui::TableNextColumn();
             ImGui::Text("Rotation");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, red_bg_color);
-            ImGui::DragFloat("##rotX", &(entity->rotation[0]), 0.1f, 0.0f, 0.0f, "X: %.2f");
+            ImGui::DragFloat("##rotX", &rotation[0], 0.1f, 0.0f, 0.0f, "X: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, green_bg_color);
-            ImGui::DragFloat("##rotY", &(entity->rotation[1]), 0.1f, 0.0f, 0.0f, "Y: %.2f");
+            ImGui::DragFloat("##rotY", &rotation[1], 0.1f, 0.0f, 0.0f, "Y: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, blue_bg_color);
-            ImGui::DragFloat("##rotZ", &(entity->rotation[2]), 0.1f, 0.0f, 0.0f, "Z: %.2f");
+            ImGui::DragFloat("##rotZ", &rotation[2], 0.1f, 0.0f, 0.0f, "Z: %.2f");
 
             ImGui::TableNextColumn();
             ImGui::Text("Scale");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, red_bg_color);
-            ImGui::DragFloat("##scaleX", &(entity->scale[0]), 0.01f, 0.0f, 0.0f, "X: %.2f");
+            ImGui::DragFloat("##scaleX", &scale[0], 0.01f, 0.0f, 0.0f, "X: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, green_bg_color);
-            ImGui::DragFloat("##scaleY", &(entity->scale[1]), 0.01f, 0.0f, 0.0f, "Y: %.2f");
+            ImGui::DragFloat("##scaleY", &scale[1], 0.01f, 0.0f, 0.0f, "Y: %.2f");
             ImGui::TableNextColumn();
             ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, blue_bg_color);
-            ImGui::DragFloat("##scaleZ", &(entity->scale[2]), 0.01f, 0.0f, 0.0f, "Z: %.2f");
+            ImGui::DragFloat("##scaleZ", &scale[2], 0.01f, 0.0f, 0.0f, "Z: %.2f");
 
             ImGui::EndTable();
+
+            ImGuizmo::RecomposeMatrixFromComponents(position, rotation, scale, glm::value_ptr(entity->getTransform()));
         }
     }
 }
@@ -146,11 +152,13 @@ void displayLightEntityProperties(std::shared_ptr<Entity> ent)
     Entity *entity = ent.get();
     Light *light = dynamic_cast<Light *>(entity);
 
-    if (ImGui::CollapsingHeader("Point Light Settings", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("Light Settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (light->getType() == LightType::PointLight)
         {
             PointLight *pLight = dynamic_cast<PointLight *>(light);
+            if (pLight == nullptr)
+                return;
             float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.y) * 0.50f;
             ImGui::SetNextItemWidth(w);
             ImGui::ColorPicker3("Light Color", pLight->lightColor);
@@ -160,6 +168,20 @@ void displayLightEntityProperties(std::shared_ptr<Entity> ent)
             ImGui::SliderFloat("Constant Term", &(pLight->constantTerm), 0.5f, 1.5f);
             ImGui::SliderFloat("Linear Term", &(pLight->linearTerm), 0.01f, 0.1f);
             ImGui::SliderFloat("Quadratic Term", &(pLight->quadraticTerm), 0.01f, 0.08f);
+        }
+
+        if (light->getType() == LightType::DirectionalLight)
+        {
+            DirectionalLight *pLight = dynamic_cast<DirectionalLight *>(light);
+            if (pLight == nullptr)
+                return;
+            
+            float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.y) * 0.50f;
+            ImGui::SetNextItemWidth(w);
+            ImGui::ColorPicker3("Light Color", pLight->lightColor);
+            ImGui::SliderFloat("Light Intensity", &(pLight->intensity), 0.0f, 5.0f);
+            ImGui::Separator();
+            ImGui::DragFloat3("Light Direction", pLight->direction, .01f, -1.0f, 1.0f);
         }
     }
 }

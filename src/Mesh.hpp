@@ -57,8 +57,6 @@ public:
         setupMesh();
 
         material = std::make_shared<PhongMaterial>();
-        material->useDiffuseMap = true;
-        material->diffuseMap = TextureManager().GetInstance()->loadTexture("../models/backpack/textures/Scene_-_Root_baseColor.jpeg", TextureType::DIFFUSE);
     }
 
     ~Mesh()

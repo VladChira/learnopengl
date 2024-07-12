@@ -23,6 +23,8 @@ void rasterizerSettings(OpenGlRenderer *renderer)
             SceneManager::GetInstance()->bgColor[2] = 0.0f;
             renderer->drawGrid = false;
             renderer->drawLightGizmos = false;
+            renderer->drawTransformGizmos = false;
+            renderer->wireframeMode = false;
         }
         ImGui::SameLine();
         if (ImGui::Button("Viewport Mode"))
@@ -32,6 +34,8 @@ void rasterizerSettings(OpenGlRenderer *renderer)
             SceneManager::GetInstance()->bgColor[2] = 0.125f;
             renderer->drawGrid = true;
             renderer->drawLightGizmos = true;
+            renderer->drawTransformGizmos = true;
+            renderer->wireframeMode = false;
         }
 
         float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.y) * 0.50f;
@@ -40,5 +44,7 @@ void rasterizerSettings(OpenGlRenderer *renderer)
 
         ImGui::Checkbox("Enable grid", &renderer->drawGrid);
         ImGui::Checkbox("Enable light gizmos", &renderer->drawLightGizmos);
+        ImGui::Checkbox("Enable transform gizmos", &renderer->drawTransformGizmos);
+        ImGui::Checkbox("Wireframe Mode", &renderer->wireframeMode);
     }
 }

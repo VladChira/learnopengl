@@ -6,6 +6,9 @@
 #include "Panels/SceneHierarchy.hpp"
 #include "Panels/PropertiesPanel.hpp"
 #include "Panels/SettingsPanel.hpp"
+#include "Panels/ToolsPanel.hpp"
+
+#include "../stb_image.h"
 
 const char *glsl_version = "#version 130";
 
@@ -35,6 +38,12 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     embraceTheDarkness();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Load textures needed for GUI
+    bool ok = TextureFromFile("../textures/icons/light.png", addLightButtonTex);
+    if (!ok)
+        std::cout << "Failed to load texture for Add Light Button.\n";
+
     std::cout << "Successfully initialzed ImGui.\n";
 
     renderer = std::make_unique<OpenGlRenderer>(width, height);
@@ -56,6 +65,8 @@ void Window::onUpdate()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
+    ImGuizmo::BeginFrame();
 
     // Draw the GUI here
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID);
@@ -126,11 +137,92 @@ void Window::onUpdate()
     }
     ImGui::EndMainMenuBar();
 
+    if (ImGui::Begin("Viewport"))
+    {
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+
+        // Define the aspect ratio of your scene
+        float aspect_ratio = 16.0f / 9.0f;
+
+        // Calculate the new dimensions preserving the aspect ratio
+        float new_width = avail.x;
+        float new_height = avail.x / aspect_ratio;
+
+        if (new_height > avail.y)
+        {
+            new_height = avail.y;
+            new_width = avail.y * aspect_ratio;
+        }
+        // Resize the framebuffer and set the viewport
+        renderer->RescaleFrameBuffer(new_width, new_height);
+        glViewport(0, 0, new_width, new_height);
+        renderer->Render();
+
+        // Draw the texture with the calculated size
+        unsigned int tex = renderer->getFrameBufferTexture();
+        ImGui::Image(
+            (ImTextureID)tex,
+            ImVec2(new_width, new_height),
+            ImVec2(0, 1),
+            ImVec2(1, 0));
+
+        bool gizmoSelected = false;
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::AllowAxisFlip(false);
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, new_width, new_height);
+        auto entity = SceneManager::GetInstance()->selectedEntity.get();
+        auto camera = SceneManager::GetInstance()->activeCamera.get();
+        if (renderer->drawTransformGizmos && entity != nullptr && camera != nullptr)
+        {
+            // Manipulate the transform of this selected entity
+            static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
+            static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+            if (ImGui::IsKeyPressed(ImGuiKey_T, false))
+                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            if (ImGui::IsKeyPressed(ImGuiKey_R, false))
+                mCurrentGizmoOperation = ImGuizmo::ROTATE;
+            if (ImGui::IsKeyPressed(ImGuiKey_E, false))
+                mCurrentGizmoOperation = ImGuizmo::SCALE;
+
+            if (ImGui::IsKeyPressed(ImGuiKey_L, false))
+                if (mCurrentGizmoMode == ImGuizmo::WORLD)
+                    mCurrentGizmoMode = ImGuizmo::LOCAL;
+                else
+                    mCurrentGizmoMode = ImGuizmo::WORLD;
+
+            ImGuizmo::Manipulate(glm::value_ptr(camera->GetViewMatrix()), glm::value_ptr(camera->GetProjectionMatrix(new_width, new_height)),
+                                 mCurrentGizmoOperation, mCurrentGizmoMode, (float *)glm::value_ptr(entity->getTransform()));
+        }
+
+        if (!ImGuizmo::IsUsing() && ImGui::IsItemHovered() && io->MouseDown[0])
+        {
+            auto pos = SceneManager::GetInstance()->activeCamera;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(FORWARD, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(BACKWARD, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(LEFT, io->DeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(RIGHT, io->DeltaTime);
+
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            {
+                ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.1f);
+                SceneManager::GetInstance()->activeCamera->ProcessMouseMovement(mouseDelta.x, -mouseDelta.y);
+                ImGui::ResetMouseDragDelta();
+            }
+        }
+    }
+    ImGui::End();
+
     ImGuiWindowClass c;
     c.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
     ImGui::SetNextWindowClass(&c);
     if (ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoTitleBar))
     {
+        toolsPanel(addLightButtonTex);
     }
     ImGui::End();
 
@@ -166,58 +258,6 @@ void Window::onUpdate()
     if (ImGui::Begin("Settings"))
     {
         rasterizerSettings(renderer.get());
-    }
-    ImGui::End();
-
-    if (ImGui::Begin("Viewport"))
-    {
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-
-        // Define the aspect ratio of your scene
-        float aspect_ratio = 16.0f / 9.0f;
-
-        // Calculate the new dimensions preserving the aspect ratio
-        float new_width = avail.x;
-        float new_height = avail.x / aspect_ratio;
-
-        if (new_height > avail.y)
-        {
-            new_height = avail.y;
-            new_width = avail.y * aspect_ratio;
-        }
-
-        // Resize the framebuffer and set the viewport
-        renderer->RescaleFrameBuffer(new_width, new_height);
-        glViewport(0, 0, new_width, new_height);
-        renderer->Render();
-
-        // Draw the texture with the calculated size
-        unsigned int tex = renderer->getFrameBufferTexture();
-        ImGui::Image(
-            (ImTextureID)tex,
-            ImVec2(new_width, new_height),
-            ImVec2(0, 1),
-            ImVec2(1, 0));
-
-        if (ImGui::IsItemHovered() && io->MouseDown[0])
-        {
-            auto pos = SceneManager::GetInstance()->activeCamera;
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(FORWARD, io->DeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(BACKWARD, io->DeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(LEFT, io->DeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-                SceneManager::GetInstance()->activeCamera->ProcessKeyboard(RIGHT, io->DeltaTime);
-
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-            {
-                ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.1f);
-                SceneManager::GetInstance()->activeCamera->ProcessMouseMovement(mouseDelta.x, -mouseDelta.y);
-                ImGui::ResetMouseDragDelta();
-            }
-        }
     }
     ImGui::End();
 
@@ -422,4 +462,41 @@ void embraceTheDarkness()
     style.GrabRounding = 3;
     style.LogSliderDeadzone = 4;
     style.TabRounding = 4;
+}
+
+bool Window::TextureFromFile(std::string filename, unsigned int &textureID)
+{
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load from: " << filename << std::endl;
+        stbi_image_free(data);
+        return false;
+    }
+
+    return true;
 }

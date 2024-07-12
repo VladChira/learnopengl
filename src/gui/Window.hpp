@@ -12,6 +12,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "ImGuizmo.h"
+
 #include "Events.hpp"
 #include "../renderers/OpenGlRenderer.hpp"
 
@@ -59,5 +61,9 @@ private:
     bool initialized = false;
     bool vsyncEnabled = true;
 
+    unsigned int addLightButtonTex;
+
     std::unique_ptr<OpenGlRenderer> renderer;
+
+    bool TextureFromFile(std::string filename, unsigned int &textureID);
 };

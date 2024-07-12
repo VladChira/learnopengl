@@ -6,6 +6,7 @@
 
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 enum class EntityType
 {
@@ -54,42 +55,15 @@ public:
         }
     }
 
-    float position[3];
-    float rotation[3]; // Euler angles in degrees
-    float scale[3];
-
+    glm::mat4 transform;
     void resetTransform()
     {
-        position[0] = 0.0f;
-        position[1] = 0.0f;
-        position[2] = 0.0f;
-
-        rotation[0] = 0.0f;
-        rotation[1] = 0.0f;
-        rotation[2] = 0.0f;
-
-        scale[0] = 1.0f;
-        scale[1] = 1.0f;
-        scale[2] = 1.0f;
+        transform = glm::mat4(1.0f);
     }
 
-    virtual glm::mat4 getModelMatrix()
+    virtual glm::mat4 &getTransform()
     {
-        glm::vec3 p = glm::vec3(position[0], position[1], position[2]);
-        glm::vec3 r = glm::vec3(rotation[0], rotation[1], rotation[2]); // Euler angles in degrees
-        glm::vec3 s = glm::vec3(scale[0], scale[1], scale[2]);
-
-        glm::mat4 model = glm::mat4(1.0f);
-
-        model = glm::translate(model, p);
-
-        model = glm::rotate(model, glm::radians(r.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(r.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(r.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        model = glm::scale(model, s);
-
-        return model;
+        return transform;
     }
 
 private:

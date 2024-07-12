@@ -4,6 +4,7 @@
 
 #include "../entities/CubePrimitive.hpp"
 #include "../lights/PointLight.hpp"
+#include "../lights/DirectionalLight.hpp"
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
@@ -18,11 +19,15 @@ void OpenGlRenderer::RescaleFrameBuffer(float width, float height)
 OpenGlRenderer::OpenGlRenderer(float width, float height)
 {
     glEnable(GL_DEPTH_TEST);
+
     gridShader.init("../shaders/grid.vert", "../shaders/grid.frag");
     initGrid();
 
     pointLightMarker.init("../shaders/pointlightmarker.vert", "../shaders/pointlightmarker.frag");
     initPointLightMarker();
+
+    dirLightMarker.init("../shaders/dirlightmarker.vert", "../shaders/dirlightmarker.frag");
+    initDirLightMarker();
 
     meshShader.init("../shaders/shader.vert", "../shaders/shader.frag");
 
@@ -31,21 +36,22 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     sceneBuffer.Init(this->width, this->height);
 
     std::shared_ptr<Model> model = std::make_shared<Model>();
-    model->setName("Backpack");
+    model->setName("Car");
     model->Init("../models/backpack/scene.gltf");
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, glm::vec3(-1.5f, 0.0f, -1.5f));
+    transform = glm::scale(transform, glm::vec3(0.01f));
+    model->transform = transform;
     SceneManager::GetInstance()->addModel(model);
-
-    std::shared_ptr<CubePrimitive> cube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
-    cube->setName("Test Cube");
-    SceneManager::GetInstance()->addPrimitive(cube);
-
-    std::shared_ptr<PointLight> light = std::make_shared<PointLight>();
-    light->setName("Default Point Light");
-    SceneManager::GetInstance()->addLight(light);
 }
 
 void OpenGlRenderer::Render()
 {
+    if (wireframeMode)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     std::shared_ptr<Camera> camera = SceneManager::GetInstance()->activeCamera;
     float *bgColor = SceneManager::GetInstance()->bgColor;
 
@@ -54,36 +60,50 @@ void OpenGlRenderer::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), this->width / this->height, 0.1f, 100.0f);
+    glm::mat4 projection = camera->GetProjectionMatrix(width, height);
     glm::mat4 view = camera->GetViewMatrix();
 
     if (drawLightGizmos)
     {
-        pointLightMarker.use();
-        model = glm::translate(model, glm::vec3(0.2f, 0.0f, 2.5f));
-        pointLightMarker.setMat4("projection", projection);
-        pointLightMarker.setMat4("view", view);
-
         for (int i = 0; i < SceneManager::GetInstance()->lights.size(); i++)
         {
             auto light = SceneManager::GetInstance()->lights[i];
-            pointLightMarker.setMat4("model", light->getModelMatrix());
-
             if (light->getType() == LightType::PointLight)
             {
                 PointLight *pLight = dynamic_cast<PointLight *>(light.get());
-                pointLightMarker.setVec3("markerColor", pLight->lightColor[0], pLight->lightColor[1], pLight->lightColor[2]);
-            }
-            else
-            {
-                pointLightMarker.setVec3("markerColor", 1.0, 1.0, 1.0);
-            }
+                if (pLight == nullptr)
+                    continue;
 
-            glBindVertexArray(pointLightMarker_VAO);
-            glLineWidth(2.0f);
-            glDrawArrays(GL_LINES, 0, 24);
-            glBindVertexArray(0);
-            model = glm::mat4(1.0f);
+                pointLightMarker.use();
+                pointLightMarker.setMat4("projection", projection);
+                pointLightMarker.setMat4("view", view);
+                pointLightMarker.setMat4("model", pLight->getTransform());
+                pointLightMarker.setVec3("markerColor", pLight->lightColor[0], pLight->lightColor[1], pLight->lightColor[2]);
+
+                glBindVertexArray(pointLightMarker_VAO);
+                glLineWidth(2.0f);
+                glDrawArrays(GL_LINES, 0, 24);
+                glBindVertexArray(0);
+                continue;
+            }
+            if (light->getType() == LightType::DirectionalLight)
+            {
+                DirectionalLight *pLight = dynamic_cast<DirectionalLight *>(light.get());
+                if (pLight == nullptr)
+                    continue;
+
+                dirLightMarker.use();
+                dirLightMarker.setMat4("projection", projection);
+                dirLightMarker.setMat4("view", view);
+                dirLightMarker.setMat4("model", pLight->getTransform());
+                dirLightMarker.setVec3("direction", pLight->direction[0], pLight->direction[1], pLight->direction[2]);
+                dirLightMarker.setVec3("markerColor", pLight->lightColor[0], pLight->lightColor[1], pLight->lightColor[2]);
+
+                glBindVertexArray(dirLightMarker_VAO);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glBindVertexArray(0);
+                continue;
+            }
         }
     }
 
@@ -99,11 +119,8 @@ void OpenGlRenderer::Render()
     }
 
     meshShader.use();
-
-    // meshShader.setVec3("dirLight.direction", 0.0f, -1.0f, 0.0f);
-    // meshShader.setVec3("dirLight.color", 1.0f, 1.0f, 1.0f);
     meshShader.setInt("numPointLights", SceneManager::GetInstance()->nrOfPointLights);
-    meshShader.setInt("numDirLights", SceneManager::GetInstance()->nrOfPointLights);
+    meshShader.setInt("numDirLights", SceneManager::GetInstance()->nrOfDirLights);
     meshShader.setInt("numSpotLights", SceneManager::GetInstance()->nrOfSpotLights);
     for (int i = 0; i < SceneManager::GetInstance()->lights.size(); i++)
     {
@@ -117,14 +134,17 @@ void OpenGlRenderer::Render()
     for (int i = 0; i < SceneManager::GetInstance()->models.size(); i++)
     {
         auto model = SceneManager::GetInstance()->models[i];
-        meshShader.setMat4("model", model->getModelMatrix());
+        auto modelMatrix = model->getTransform();
+        meshShader.setMat4("model", modelMatrix);
         model->Draw(meshShader);
     }
 
     for (int i = 0; i < SceneManager::GetInstance()->primitives.size(); i++)
     {
         auto primitive = SceneManager::GetInstance()->primitives[i];
-        meshShader.setMat4("model", primitive->getModelMatrix());
+        auto modelMatrix = primitive->getTransform();
+        meshShader.setMat4("model", modelMatrix);
+
         primitive->Draw(meshShader);
     }
 
@@ -193,6 +213,31 @@ void OpenGlRenderer::initPointLightMarker()
     glBufferData(GL_ARRAY_BUFFER, sizeof(markerVertices), markerVertices, GL_STATIC_DRAW);
 
     // Specify vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void OpenGlRenderer::initDirLightMarker()
+{
+    GLfloat vertices[] = {
+        0.0f, -1.0f, 0.0f, // Start point bottom
+        1.0f, -1.0f, 0.0f, // End point bottom
+        0.0f, 1.0f, 0.0f,  // Start point top
+        1.0f, 1.0f, 0.0f   // End point top
+    };
+    unsigned int VBO;
+    // Generate and bind the VAO and VBO
+    glGenVertexArrays(1, &dirLightMarker_VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(dirLightMarker_VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(0);
 

@@ -1,7 +1,7 @@
 # Stuff I make while learning to write a PBR rasterizer in OpenGL
 
-<p align="center"><img src="images/v0.0.4.png" width="700"/></p>
-<p align="center">Current interface with a backpack model, a simple cube and a point light</p>
+<p align="center"><img src="images/v0.0.5.png" width="700"/></p>
+<p align="center">Current interface with a backpack model, a simple cube, 2 point lights, wireframed and with a 3D transform gizmo</p>
 
 ## Roadmap:
 - ~~Basic OpenGl stuff: VAOs, VBOs, shaders, textures~~
@@ -10,12 +10,14 @@
 - ~~3D Model loading~~
 - ~~Basic ImGUI UI: viewport~~
 - ~~Entity hierarchy~~
-- Primitives: cubes, spheres, triangles, cylinders
-- Good ImGUI UI: entities property panel, import models, add lights, multiple cameras
-- 3D move/rotate/scale gizmos
+- Primitives: ~~cubes~~, spheres, triangles, cylinders
+- Good ImGUI UI: ~~entities property panel~~, import models, add lights, multiple cameras
+- ~~3D move/rotate/scale gizmos~~
+- Enable/Disable object (Visibility)
 - Anti-aliasing
-- Face culling, depth testing
+- ~~Face culling, depth testing~~
 - Better GLSL
+- Deferred shading
 - Shadows
 - Normal maps
 - HDR
@@ -30,6 +32,7 @@
 Dependencies (so far):
 - OpenGL w/ GLEW & GLFW
 - Dear ImGUI - docking branch
+- ImGuizmo
 - stb_image.h
 - Assimp library
 

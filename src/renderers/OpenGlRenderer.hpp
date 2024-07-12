@@ -13,6 +13,8 @@
 #include "../framebuffer/Framebuffer.hpp"
 #include "../Shader.hpp"
 
+#include "ImGuizmo.h"
+
 class OpenGlRenderer
 {
 public:
@@ -25,10 +27,13 @@ public:
 
     bool drawGrid = true;
     bool drawLightGizmos = true;
+    bool drawTransformGizmos = true;
+    bool wireframeMode = false;
 
 private:
     void initGrid();
     void initPointLightMarker();
+    void initDirLightMarker();
 
     float width, height;
     FrameBuffer sceneBuffer;
@@ -42,6 +47,10 @@ private:
     // Point Light marker stuff
     Shader pointLightMarker;
     unsigned int pointLightMarker_VAO;
+
+    // Directional Light marker stuff
+    Shader dirLightMarker;
+    unsigned int dirLightMarker_VAO;
 
     // Mesh shaders
     Shader meshShader;

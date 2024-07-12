@@ -1,5 +1,9 @@
 #include "SceneManager.hpp"
 
+#include "lights/PointLight.hpp"
+#include "entities/CubePrimitive.hpp"
+#include "lights/DirectionalLight.hpp"
+
 SceneManager *SceneManager::sm_instance{nullptr};
 
 void SceneManager::addMesh(std::shared_ptr<Mesh> newMesh)
@@ -93,9 +97,34 @@ SceneManager::SceneManager()
 {
     // A scene always has at least one camera
     std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(5.61f, 1.55f, 5.04), glm::vec3(0.0f, 1.0f, 0.0f), -136.9f, -12.6f);
-    camera->setName("Default Camera");
+    camera->setName("Camera");
     addCamera(camera);
     this->activeCamera = camera;
+
+    // Add a default light
+    std::shared_ptr<PointLight> defaultLight = std::make_shared<PointLight>();
+    defaultLight->setName("Point Light");
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, glm::vec3(-0.21f, 0.95f, 3.0f));
+    defaultLight->transform = transform;
+    addLight(defaultLight);
+
+    std::shared_ptr<PointLight> defaultLight2 = std::make_shared<PointLight>();
+    defaultLight2->setName("Point Light 2");
+    defaultLight2->transform = transform;
+    addLight(defaultLight2);
+
+    // std::shared_ptr<DirectionalLight> light = std::make_shared<DirectionalLight>();
+    // light->setName("Directional Light");
+    // light->position[0] = -0.21f;
+    // light->position[1] = 0.95f;
+    // light->position[2] = 3.0f;
+    // addLight(light);
+
+    // And a default cube
+    std::shared_ptr<CubePrimitive> defaultCube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
+    defaultCube->setName("Cube");
+    addPrimitive(defaultCube);
 
     // Set the clear color to black by default
     bgColor[0] = 0.125f;
@@ -103,7 +132,7 @@ SceneManager::SceneManager()
     bgColor[2] = 0.125f;
     bgColor[3] = 1.0f;
 
-    // Nothing is selected at first
+    // Nothing is selected in the hierarchy at first
     selectedEntity = nullptr;
 }
 

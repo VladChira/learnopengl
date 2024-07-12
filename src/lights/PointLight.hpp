@@ -16,16 +16,16 @@ public:
         quadraticTerm = 0.032f;
     }
 
-    glm::mat4 getModelMatrix() override
+    glm::mat4 &getTransform() override
     {
-        glm::vec3 p = glm::vec3(position[0], position[1], position[2]);
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, p);
-        return model;
+        return transform;
     }
 
     virtual void setUniforms(Shader &shader, int indexOfLight) override
     {
+        float position[3], rotation[3], scale[3];
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), position, rotation, scale);
+
         std::string uniformName = "pointLights[" + std::to_string(indexOfLight) + "]";
         shader.setVec3((uniformName + ".position").c_str(), glm::vec3(position[0], position[1], position[2]));
         shader.setVec3((uniformName + ".color").c_str(), lightColor[0] * intensity, lightColor[1] * intensity, lightColor[2] * intensity);
