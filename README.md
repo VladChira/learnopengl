@@ -1,7 +1,7 @@
 # Stuff I make while learning to write a PBR rasterizer in OpenGL
 
-<p align="center"><img src="images/v0.0.5.png" width="700"/></p>
-<p align="center">Current interface with a backpack model, a simple cube, 2 point lights, wireframed and with a 3D transform gizmo</p>
+<p align="center"><img src="images/v0.0.6.png" width="700"/></p>
+<p align="center">Dabrovic Sponza scene, a simple cube and 2 point lights</p>
 
 ## Roadmap:
 - ~~Basic OpenGl stuff: VAOs, VBOs, shaders, textures~~
@@ -37,6 +37,12 @@ Dependencies (so far):
 - Assimp library
 
 ## Previous versions
+
+<p align="center"><img src="images/v0.0.5.png" width="700"/></p>
+<p align="center">v0.0.5 with a backpack model, a simple cube and 2 point lights, wireframed</p>
+
+<p align="center"><img src="images/v0.0.4.png" width="700"/></p>
+<p align="center">v0.0.4 with a backpack model, a simple cube and a point light</p>
 
 <p align="center"><img src="images/v0.0.3.png" width="700"/></p>
 <p align="center">v0.0.3 with a backpack model, a simple cube and a point light</p>

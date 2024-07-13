@@ -11,7 +11,7 @@ class PhongMaterial : public Material
 {
 public:
     PhongMaterial()
-        : Material(MaterialType::Phong), ka(0.1f), ambient(0.1f),
+        : Material(MaterialType::Phong), ka(0.1f), ambient(0.4f),
           kd(1.0f), diffuse(1.0f), diffuseMap(nullptr), useDiffuseMap(false),
           ks(0.6f), specular(0.5f), specularMap(nullptr), useSpecularMap(false),
           shininess(10.0f)

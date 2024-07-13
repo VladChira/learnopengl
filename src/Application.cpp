@@ -21,7 +21,7 @@ void Application::onUpdate()
 
 int Application::Start(std::string title, const unsigned int width, const unsigned int height, bool enableVsync)
 {
-    // stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true);
 
     this->window = std::make_unique<Window>(title, width, height, enableVsync);
 

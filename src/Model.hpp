@@ -58,7 +58,7 @@ private:
     {
         // read file via ASSIMP
         Assimp::Importer importer;
-        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
         // check for errors
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
         {
@@ -189,7 +189,15 @@ private:
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         // return a mesh object created from the extracted mesh data
-        return std::make_shared<Mesh>(vertices, indices, textures);
+        auto newMesh = std::make_shared<Mesh>(vertices, indices, textures);
+
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+        {
+            newMesh->material->useDiffuseMap = true;
+            newMesh->material->diffuseMap = diffuseMaps[0];
+        }
+
+        return newMesh;
     }
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.

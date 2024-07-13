@@ -29,6 +29,7 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
+    std::cout << "Destroying texture manager\n";
     
 }
 

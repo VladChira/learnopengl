@@ -36,11 +36,11 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     sceneBuffer.Init(this->width, this->height);
 
     std::shared_ptr<Model> model = std::make_shared<Model>();
-    model->setName("Car");
-    model->Init("../models/backpack/scene.gltf");
+    model->setName("Sponza Palace");
+    model->Init("../models/sponza/sponza.obj");
     glm::mat4 transform = glm::mat4(1.0f);
-    transform = glm::translate(transform, glm::vec3(-1.5f, 0.0f, -1.5f));
-    transform = glm::scale(transform, glm::vec3(0.01f));
+    // transform = glm::translate(transform, glm::vec3(-1.5f, 0.0f, -1.5f));
+    // transform = glm::scale(transform, glm::vec3(0.01f));
     model->transform = transform;
     SceneManager::GetInstance()->addModel(model);
 }

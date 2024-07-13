@@ -261,6 +261,13 @@ void Window::onUpdate()
     }
     ImGui::End();
 
+    // if (ImGui::Begin("FPS"))
+    // {
+    //     std::string s(std::to_string(io->Framerate));
+    //     ImGui::Text(s.c_str());
+    // }
+    // ImGui::End();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -344,6 +351,8 @@ void Window::Shutdown()
     glfwDestroyWindow(window);
     glfwTerminate();
     std::cout << "Destroying window\n";
+
+    TextureManager::DestroyInstance();
 }
 
 void ConsoleLogWindow()
