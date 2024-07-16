@@ -32,6 +32,11 @@ public:
         shader.setFloat((uniformName + ".constant").c_str(), constantTerm);
         shader.setFloat((uniformName + ".linear").c_str(), linearTerm);
         shader.setFloat((uniformName + ".quadratic").c_str(), quadraticTerm);
+
+        if (!enabled)
+        {
+            shader.setVec3((uniformName + ".color").c_str(), 0, 0, 0);
+        }
     }
 
     float lightColor[3];

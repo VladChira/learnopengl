@@ -10,6 +10,7 @@ void Model::Init(std::string const &path)
 
 void Model::Draw(Shader &shader)
 {
+    if (!enabled) return;
     for (unsigned int i = 0; i < meshes.size(); i++)
         meshes[i]->Draw(shader, this);
 }

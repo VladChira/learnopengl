@@ -114,8 +114,10 @@ void displayMaterialProperties(std::shared_ptr<Entity> ent)
 
 void displayBaseEntityProperties(std::shared_ptr<Entity> entity)
 {
-    if (ImGui::CollapsingHeader("Entity Information", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("Entity Settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        ImGui::Checkbox("Enabled", &(entity->enabled));
+
         ImVec2 sz = ImVec2(-FLT_MIN, 0.0f);
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 

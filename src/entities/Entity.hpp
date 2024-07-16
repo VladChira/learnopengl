@@ -69,6 +69,8 @@ public:
         return transform;
     }
 
+    bool enabled = true;
+
 private:
     std::string name;
     std::string UUID;

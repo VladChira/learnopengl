@@ -66,6 +66,8 @@ public:
     // render the mesh
     void Draw(Shader &shader, Entity *parent)
     {
+        if (!enabled) return;
+
         shader.setMat4("model", parent->transform * transform);
 
         // bind appropriate textures

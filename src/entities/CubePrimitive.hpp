@@ -78,6 +78,8 @@ public:
 
     void Draw(Shader &shader) override
     {
+        if (!enabled) return;
+
         material->setUniforms(shader);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

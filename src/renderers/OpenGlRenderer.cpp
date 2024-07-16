@@ -74,6 +74,9 @@ void OpenGlRenderer::Render()
         for (int i = 0; i < SceneManager::GetInstance()->lights.size(); i++)
         {
             auto light = SceneManager::GetInstance()->lights[i];
+            if (!light->enabled)
+                continue;
+
             if (light->getType() == LightType::PointLight)
             {
                 PointLight *pLight = dynamic_cast<PointLight *>(light.get());
