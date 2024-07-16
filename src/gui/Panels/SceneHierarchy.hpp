@@ -23,7 +23,12 @@ void displayNode(std::shared_ptr<Entity> currentEntity, std::shared_ptr<Entity> 
 
     bool node_open = ImGui::TreeNodeEx(currentEntity->getName().c_str(), flags);
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        // Mark the current entity as the selected one and open the Properties panel
         SceneManager::GetInstance()->selectedEntity = currentEntity;
+        ImGui::SetWindowFocus("Properties");
+    }
+
     if (node_open)
     {
         for (int i = 0; i < noChildren; i++)

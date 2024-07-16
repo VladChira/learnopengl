@@ -50,6 +50,17 @@ void SceneManager::addPrimitive(std::shared_ptr<Primitive> newPrimitive)
     entities.push_back(newPrimitive);
 }
 
+void SceneManager::addMaterial(std::shared_ptr<Material> newMat)
+{
+    // First, check if we don't already have this material included
+    for (int i = 0; i < materials.size(); i++)
+        if (materials[i]->getUUID() == newMat->getUUID())
+            return;
+
+    materials.push_back(newMat);
+    // do not add materials to entity because we don't want them in the hierarchy
+}
+
 void SceneManager::addLight(std::shared_ptr<Light> newLight)
 {
     // First, check if we don't already have this light included
@@ -116,15 +127,12 @@ SceneManager::SceneManager()
 
     // std::shared_ptr<DirectionalLight> light = std::make_shared<DirectionalLight>();
     // light->setName("Directional Light");
-    // light->position[0] = -0.21f;
-    // light->position[1] = 0.95f;
-    // light->position[2] = 3.0f;
     // addLight(light);
 
     // And a default cube
-    std::shared_ptr<CubePrimitive> defaultCube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
-    defaultCube->setName("Cube");
-    addPrimitive(defaultCube);
+    // std::shared_ptr<CubePrimitive> defaultCube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
+    // defaultCube->setName("Cube");
+    // addPrimitive(defaultCube);
 
     // Set the clear color to black by default
     bgColor[0] = 0.125f;

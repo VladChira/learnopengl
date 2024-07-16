@@ -2,14 +2,16 @@
 
 #include "Console.hpp"
 
-Material::Material(MaterialType type)
+Material::Material(MaterialType type) : Entity(EntityType::Material)
 {
-    this->name = "Material";
+    this->setName("Material");
+    this->materialType = type;
     Console::GetInstance()->addLogEntry("Created new material of type " + MaterialTypeToString(type));
 }
 
-Material::Material(MaterialType type, std::string name)
+Material::Material(MaterialType type, std::string name) : Entity(EntityType::Material)
 {
-    this->name = name;
+    this->setName(name);
+    this->materialType = type;
     Console::GetInstance()->addLogEntry("Created new material of type " + MaterialTypeToString(type));
 }

@@ -7,6 +7,7 @@
 #include "Panels/PropertiesPanel.hpp"
 #include "Panels/SettingsPanel.hpp"
 #include "Panels/ToolsPanel.hpp"
+#include "Panels/MaterialPanel.hpp"
 
 #include "../stb_image.h"
 
@@ -173,7 +174,7 @@ void Window::onUpdate()
         ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, new_width, new_height);
         auto entity = SceneManager::GetInstance()->selectedEntity.get();
         auto camera = SceneManager::GetInstance()->activeCamera.get();
-        if (renderer->drawTransformGizmos && entity != nullptr && camera != nullptr)
+        if (renderer->drawTransformGizmos && entity != nullptr && camera != nullptr && entity->getType() != EntityType::Material)
         {
             // Manipulate the transform of this selected entity
             static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
@@ -247,6 +248,7 @@ void Window::onUpdate()
 
     if (ImGui::Begin("Materials"))
     {
+        layoutMaterials();
     }
     ImGui::End();
 

@@ -11,6 +11,7 @@
 #include "Model.hpp"
 #include "../entities/Primitive.hpp"
 #include "lights/Light.hpp"
+#include "materials/PhongMaterial.hpp"
 
 class SceneManager
 {
@@ -28,6 +29,7 @@ public:
     void addCamera(std::shared_ptr<Camera> newCamera);
     void addPrimitive(std::shared_ptr<Primitive> newPrimitive);
     void addLight(std::shared_ptr<Light> newLight);
+    void addMaterial(std::shared_ptr<Material> newMaterial);
 
     static SceneManager *GetInstance();
     static void DestroyInstance();
@@ -42,6 +44,8 @@ public:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<std::shared_ptr<Model>> models;
     std::vector<std::shared_ptr<Camera>> cameras;
+
+    std::vector<std::shared_ptr<Material>> materials;
 
     std::vector<std::shared_ptr<Light>> lights;
     int nrOfPointLights = 0;

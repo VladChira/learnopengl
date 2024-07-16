@@ -4,22 +4,22 @@
 #include <memory>
 #include <iostream>
 
+#include "../entities/Entity.hpp"
+#include "../Shader.hpp"
+
 enum class MaterialType
 {
     Phong
 };
 
-class Material
+class Material : public Entity
 {
 public:
     Material(MaterialType type);
     Material(MaterialType type, std::string name);
     // virtual ~Material();
 
-    void setName(std::string newName) { this->name = newName; }
-    std::string getName() { return this->name; };
-
-    MaterialType getType() { return type; }
+    MaterialType getMaterialType() { return materialType; }
 
     static inline std::string MaterialTypeToString(MaterialType mt)
     {
@@ -32,8 +32,8 @@ public:
         }
     }
 
+    virtual void setUniforms(Shader &shader) = 0;
+
 private:
-    std::string name;
-    MaterialType type;
-    unsigned int ID = 0;
+    MaterialType materialType;
 };

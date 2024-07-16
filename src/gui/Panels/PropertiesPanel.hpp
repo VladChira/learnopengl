@@ -18,16 +18,32 @@ void displayBaseEntityProperties(std::shared_ptr<Entity> entity);
 void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent);
 void displayModelEntityProperties(std::shared_ptr<Entity> ent);
 void displayLightEntityProperties(std::shared_ptr<Entity> ent);
+void displayMaterialProperties(std::shared_ptr<Entity> ent);
+
+static void HelpMarker(const char *desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::BeginItemTooltip())
+    {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
 
 void displayPropertiesOfEntity(std::shared_ptr<Entity> entity)
 {
     if (entity == nullptr)
         return;
+
     displayBaseEntityProperties(entity);
+    ImGui::Separator();
 
     switch (entity->getType())
     {
     case EntityType::Primitive:
+
         displayPrimitiveEntityProperties(entity);
         break;
 
@@ -40,6 +56,59 @@ void displayPropertiesOfEntity(std::shared_ptr<Entity> entity)
         break;
     default:
         break;
+    }
+}
+
+void displayMaterialProperties(std::shared_ptr<Entity> ent)
+{
+    if (ImGui::CollapsingHeader("Material Settings", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        Entity *entity = ent.get();
+        Material *mat = dynamic_cast<Material *>(entity);
+
+        ImGui::Separator();
+
+        ImVec2 sz = ImVec2(-FLT_MIN, 0.0f);
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+
+        ImGui::Text("Material Type:");
+        ImGui::SameLine();
+
+        ImGui::ButtonEx(Material::MaterialTypeToString(mat->getMaterialType()).c_str(), sz);
+        ImGui::PopItemFlag();
+
+        if (mat->getMaterialType() == MaterialType::Phong)
+        {
+            PhongMaterial *p_mat = dynamic_cast<PhongMaterial *>(mat);
+            if (p_mat == nullptr)
+                return;
+
+            ImGui::Checkbox("Use diffuse texture", &(p_mat->useDiffuseMap));
+            ImGui::ColorEdit3("Diffuse Color", p_mat->diffuse);
+            ImGui::SliderFloat("kD", &(p_mat->kd), 0.0f, 1.0f);
+            std::string texturePath = "[no texture]";
+            if (p_mat->diffuseMap != nullptr)
+                texturePath = p_mat->diffuseMap->path;
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::Text("Diffuse texture path:");
+            ImGui::SameLine();
+            ImGui::ButtonEx(texturePath.c_str(), sz);
+            ImGui::PopItemFlag();
+
+            ImGui::Separator();
+
+            ImGui::Checkbox("Use specular texture", &(p_mat->useSpecularMap));
+            ImGui::ColorEdit3("Specular Color", p_mat->specular);
+            ImGui::SliderFloat("kS", &(p_mat->ks), 0.0f, 1.0f);
+            texturePath = "[no texture]";
+            if (p_mat->specularMap != nullptr)
+                texturePath = p_mat->specularMap->path;
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::Text("Specular texture path:");
+            ImGui::SameLine();
+            ImGui::ButtonEx(texturePath.c_str(), sz);
+            ImGui::PopItemFlag();
+        }
     }
 }
 
@@ -65,6 +134,15 @@ void displayBaseEntityProperties(std::shared_ptr<Entity> entity)
 
         ImGui::PopItemFlag();
     }
+
+    if (entity->getType() == EntityType::Material)
+    {
+        displayMaterialProperties(entity);
+        return;
+    }
+
+    ImGui::Separator();
+
     if (ImGui::CollapsingHeader("Entity Transform", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ImGui::Button("Reset Transform"))
@@ -162,9 +240,11 @@ void displayLightEntityProperties(std::shared_ptr<Entity> ent)
             float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.y) * 0.50f;
             ImGui::SetNextItemWidth(w);
             ImGui::ColorPicker3("Light Color", pLight->lightColor);
-            ImGui::SliderFloat("Light Intensity", &(pLight->intensity), 0.0f, 5.0f);
+            ImGui::DragFloat("Light Intensity", &(pLight->intensity), 0.05f, 0.0f, 10.0f);
             ImGui::Separator();
             ImGui::Text("Light Fallof Settings");
+            ImGui::SameLine();
+            HelpMarker("Change how the light gets dimmer with distance. Ctrl+Click to manually edit values");
             ImGui::SliderFloat("Constant Term", &(pLight->constantTerm), 0.5f, 1.5f);
             ImGui::SliderFloat("Linear Term", &(pLight->linearTerm), 0.01f, 0.1f);
             ImGui::SliderFloat("Quadratic Term", &(pLight->quadraticTerm), 0.01f, 0.08f);
@@ -175,7 +255,7 @@ void displayLightEntityProperties(std::shared_ptr<Entity> ent)
             DirectionalLight *pLight = dynamic_cast<DirectionalLight *>(light);
             if (pLight == nullptr)
                 return;
-            
+
             float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.y) * 0.50f;
             ImGui::SetNextItemWidth(w);
             ImGui::ColorPicker3("Light Color", pLight->lightColor);

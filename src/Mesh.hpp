@@ -47,16 +47,15 @@ public:
     std::shared_ptr<PhongMaterial> material;
 
     // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture>> textures) : Entity(EntityType::Mesh)
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture>> textures, std::shared_ptr<PhongMaterial> material) : Entity(EntityType::Mesh)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->material = material;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
-
-        material = std::make_shared<PhongMaterial>();
     }
 
     ~Mesh()
@@ -65,8 +64,10 @@ public:
     }
 
     // render the mesh
-    void Draw(Shader &shader)
+    void Draw(Shader &shader, Entity *parent)
     {
+        shader.setMat4("model", parent->transform * transform);
+
         // bind appropriate textures
         material->setUniforms(shader);
 

@@ -110,6 +110,12 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results
+    vec3 ambient;
+    if (material.useDiffuseMap)
+        ambient = vec3(texture(material.diffuseMap, TexCoords));
+    else
+        ambient = material.ambient;
+
     vec3 diffuse;
     if (material.useDiffuseMap)
         diffuse = light.color * diff * vec3(texture(material.diffuseMap, TexCoords));
@@ -122,7 +128,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     else
         specular = light.color * spec * material.specular;
 
-    return (material.ka * material.ambient + material.kd * diffuse + material.ks * specular);
+    return (material.ka * ambient + material.kd * diffuse + material.ks * specular);
 }
 
 
@@ -140,6 +146,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));  
   
     // combine results
+    vec3 ambient;
+    if (material.useDiffuseMap)
+        ambient = vec3(texture(material.diffuseMap, TexCoords));
+    else
+        ambient = material.ambient;
+
     vec3 diffuse;
     if (material.useDiffuseMap)
         diffuse = light.color * diff * vec3(texture(material.diffuseMap, TexCoords));
@@ -154,7 +166,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     diffuse *= attenuation;
     specular *= attenuation;
-    return (material.ka * material.ambient + material.kd * diffuse + specular);
+    return (material.ka * ambient + material.kd * diffuse + material.ks * specular);
 }
 
 // // calculates the color when using a spot light.
@@ -180,5 +192,5 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 //     ambient *= attenuation * intensity;
 //     diffuse *= attenuation * intensity;
 //     specular *= attenuation * intensity;
-//     return (material.ka * ambient + material.kd * diffuse + specular);
+//     return (material.ka * ambient + material.kd * diffuse + material.ks * specular);
 // }

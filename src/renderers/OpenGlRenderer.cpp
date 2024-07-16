@@ -19,6 +19,7 @@ void OpenGlRenderer::RescaleFrameBuffer(float width, float height)
 OpenGlRenderer::OpenGlRenderer(float width, float height)
 {
     glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_FRAMEBUFFER_SRGB);
 
     gridShader.init("../shaders/grid.vert", "../shaders/grid.frag");
     initGrid();
@@ -36,13 +37,18 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     sceneBuffer.Init(this->width, this->height);
 
     std::shared_ptr<Model> model = std::make_shared<Model>();
-    model->setName("Sponza Palace");
     model->Init("../models/sponza/sponza.obj");
     glm::mat4 transform = glm::mat4(1.0f);
     // transform = glm::translate(transform, glm::vec3(-1.5f, 0.0f, -1.5f));
     // transform = glm::scale(transform, glm::vec3(0.01f));
     model->transform = transform;
     SceneManager::GetInstance()->addModel(model);
+
+    std::shared_ptr<Model> model2 = std::make_shared<Model>();
+    model2->Init("../models/adamHead/adamHead.gltf");
+    transform = glm::mat4(1.0f);
+    model2->transform = transform;
+    SceneManager::GetInstance()->addModel(model2);
 }
 
 void OpenGlRenderer::Render()

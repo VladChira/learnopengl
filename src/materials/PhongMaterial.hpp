@@ -11,11 +11,22 @@ class PhongMaterial : public Material
 {
 public:
     PhongMaterial()
-        : Material(MaterialType::Phong), ka(0.1f), ambient(0.4f),
-          kd(1.0f), diffuse(1.0f), diffuseMap(nullptr), useDiffuseMap(false),
-          ks(0.6f), specular(0.5f), specularMap(nullptr), useSpecularMap(false),
+        : Material(MaterialType::Phong), ka(0.1f),
+          kd(1.0f), diffuseMap(nullptr), useDiffuseMap(false),
+          ks(0.0f), specularMap(nullptr), useSpecularMap(false),
           shininess(10.0f)
     {
+        ambient[0] = 0.4f;
+        ambient[1] = 0.4f;
+        ambient[2] = 0.4f;
+
+        diffuse[0] = 1.0f;
+        diffuse[1] = 1.0f;
+        diffuse[2] = 1.0f;
+
+        specular[0] = 0.5f;
+        specular[1] = 0.5f;
+        specular[2] = 0.5f;
     }
 
     PhongMaterial(std::string name)
@@ -25,27 +36,27 @@ public:
     }
 
     float ka;
-    glm::vec3 ambient;
+    float ambient[3];
 
     float kd;
-    glm::vec3 diffuse;
+    float diffuse[3];
     std::shared_ptr<Texture> diffuseMap;
     bool useDiffuseMap;
 
     float ks;
-    glm::vec3 specular;
+    float specular[3];
     std::shared_ptr<Texture> specularMap;
     bool useSpecularMap;
 
     float shininess;
 
-    void setUniforms(Shader &shader)
+    void setUniforms(Shader &shader) override
     {
         shader.setFloat("material.ka", ka);
-        shader.setVec3("material.ambient", ambient);
+        shader.setVec3("material.ambient", ambient[0], ambient[1], ambient[2]);
 
         shader.setFloat("material.kd", kd);
-        shader.setVec3("material.diffuse", diffuse);
+        shader.setVec3("material.diffuse", diffuse[0], diffuse[1], diffuse[2]);
         shader.setBool("material.useDiffuseMap", useDiffuseMap);
         if (useDiffuseMap && diffuseMap != nullptr)
         {
@@ -55,7 +66,7 @@ public:
         }
 
         shader.setFloat("material.ks", ks);
-        shader.setVec3("material.specular", specular);
+        shader.setVec3("material.specular", specular[0], specular[1], specular[2]);
         if (specularMap && specularMap != nullptr)
         {
             glActiveTexture(GL_TEXTURE1);
