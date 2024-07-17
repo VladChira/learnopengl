@@ -12,5 +12,15 @@
 
 void toolsPanel(unsigned int addLightTex)
 {
-    ImGui::ImageButton("Add Light Button", (ImTextureID)addLightTex, ImVec2(50,50));
+    // ImGui::ImageButton("Add Light Button", 0, ImVec2(50,50));
+    ImGui::Button("Point Light", ImVec2(0, 40));
+    ImGui::Button("Directional Light", ImVec2(0, 40));
+    ImGui::Button("Spot Light", ImVec2(0, 40));
+    ImGui::Separator();
+
+    ImGui::Button("Cube", ImVec2(0, 40));
+    ImGui::Button("Sphere", ImVec2(0, 40));
+
+    ImGui::Separator();
+    ImGui::Button("Material", ImVec2(0, 40));
 }

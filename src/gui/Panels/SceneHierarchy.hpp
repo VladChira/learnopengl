@@ -41,6 +41,8 @@ void displayNode(std::shared_ptr<Entity> currentEntity, std::shared_ptr<Entity> 
 
 void layOutSceneHierarchy()
 {
+    // FIXME: I don't like how the selected entity becomes null first and then is assigned
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseClicked(0)) SceneManager::GetInstance()->selectedEntity = nullptr;
     for (int i = 0; i < SceneManager::GetInstance()->getEntityCount(); i++)
     {
         auto selectedEntity = SceneManager::GetInstance()->selectedEntity;

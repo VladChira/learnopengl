@@ -13,6 +13,7 @@
 #include "../../SceneManager.hpp"
 #include "../../lights/PointLight.hpp"
 #include "../../lights/DirectionalLight.hpp"
+#include "../../entities/SpherePrimitive.hpp"
 
 void displayBaseEntityProperties(std::shared_ptr<Entity> entity);
 void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent);
@@ -43,7 +44,6 @@ void displayPropertiesOfEntity(std::shared_ptr<Entity> entity)
     switch (entity->getType())
     {
     case EntityType::Primitive:
-
         displayPrimitiveEntityProperties(entity);
         break;
 
@@ -222,6 +222,35 @@ void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent)
 
     Entity *entity = ent.get();
     Primitive *primitive = dynamic_cast<Primitive *>(entity);
+
+    if (primitive->primitiveType == PrimitiveType::Cube)
+    {
+    }
+    else
+    {
+        if (primitive->primitiveType == PrimitiveType::Sphere)
+        {
+            SpherePrimitive *sphere = dynamic_cast<SpherePrimitive *>(primitive);
+
+            bool smoothShading = sphere->getSmooth();
+            if (ImGui::Checkbox("Shade smooth", &smoothShading))
+            {
+                sphere->setSmooth(smoothShading);
+            }
+
+            float radius = sphere->getRadius();
+            if (ImGui::DragFloat("Sphere radius", &radius, 0.1f, 0.0f, 20.0f))
+                sphere->setRadius(radius);
+
+            int sectorCount = sphere->getSectorCount();
+            if (ImGui::DragInt("Number of sectors", &sectorCount, 1, SpherePrimitive::MIN_SECTOR_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
+                sphere->setSectorCount(sectorCount);
+
+            int stackCount = sphere->getStackCount();
+            if (ImGui::DragInt("Number of stacks", &stackCount, 1, SpherePrimitive::MIN_STACK_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
+                sphere->setStackCount(stackCount);
+        }
+    }
 }
 
 void displayLightEntityProperties(std::shared_ptr<Entity> ent)

@@ -9,7 +9,7 @@ class CubePrimitive : public Primitive
 {
 
 public:
-    CubePrimitive(float width, float height, float depth) : Primitive()
+    CubePrimitive(float width, float height, float depth) : Primitive(PrimitiveType::Cube)
     {
         this->width = width;
         this->height = height;
@@ -83,6 +83,7 @@ public:
         material->setUniforms(shader);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
     }
 
 private:

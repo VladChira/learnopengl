@@ -159,8 +159,8 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh *mesh, glm::mat4 mat, const aiSc
     std::vector<std::shared_ptr<Texture>> diffuseMaps = loadMaterialTextures(_material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // // 2. specular maps
-    // std::vector<std::shared_ptr<Texture>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::SPECULAR);
-    // textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    std::vector<std::shared_ptr<Texture>> specularMaps = loadMaterialTextures(_material, aiTextureType_SPECULAR, TextureType::SPECULAR);
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // // 3. normal maps
     // std::vector<std::shared_ptr<Texture>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, TextureType::NORMAL);
     // textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
@@ -172,6 +172,12 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh *mesh, glm::mat4 mat, const aiSc
     {
         materials[mesh->mMaterialIndex]->useDiffuseMap = true;
         materials[mesh->mMaterialIndex]->diffuseMap = diffuseMaps[0];
+    }
+
+    if (_material->GetTextureCount(aiTextureType_SPECULAR) > 0)
+    {
+        materials[mesh->mMaterialIndex]->useSpecularMap = true;
+        materials[mesh->mMaterialIndex]->specularMap = specularMaps[0];
     }
 
     // return a mesh object created from the extracted mesh data

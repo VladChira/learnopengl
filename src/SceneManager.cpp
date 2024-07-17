@@ -2,6 +2,7 @@
 
 #include "lights/PointLight.hpp"
 #include "entities/CubePrimitive.hpp"
+#include "entities/SpherePrimitive.hpp"
 #include "lights/DirectionalLight.hpp"
 
 SceneManager *SceneManager::sm_instance{nullptr};
@@ -133,6 +134,10 @@ SceneManager::SceneManager()
     // std::shared_ptr<CubePrimitive> defaultCube = std::make_shared<CubePrimitive>(1.0f, 1.0f, 1.0f);
     // defaultCube->setName("Cube");
     // addPrimitive(defaultCube);
+
+    std::shared_ptr<SpherePrimitive> sphere = std::make_shared<SpherePrimitive>(1.0f, 36, 36, true);
+    sphere->setName("Sphere");
+    addPrimitive(sphere);
 
     // Set the clear color to black by default
     bgColor[0] = 0.125f;
