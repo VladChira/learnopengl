@@ -126,6 +126,11 @@ SceneManager::SceneManager()
     defaultLight2->transform = transform;
     addLight(defaultLight2);
 
+    std::shared_ptr<PointLight> defaultLight3 = std::make_shared<PointLight>();
+    defaultLight3->setName("Point Light 3");
+    defaultLight3->transform = transform;
+    addLight(defaultLight3);
+
     // std::shared_ptr<DirectionalLight> light = std::make_shared<DirectionalLight>();
     // light->setName("Directional Light");
     // addLight(light);
@@ -138,6 +143,11 @@ SceneManager::SceneManager()
     std::shared_ptr<SpherePrimitive> sphere = std::make_shared<SpherePrimitive>(1.0f, 36, 36, true);
     sphere->setName("Sphere");
     addPrimitive(sphere);
+
+    std::shared_ptr<PhongMaterial> mat = std::make_shared<PhongMaterial>();
+    addMaterial(mat);
+
+    sphere->material = mat;
 
     // Set the clear color to black by default
     bgColor[0] = 0.125f;

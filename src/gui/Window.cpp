@@ -11,6 +11,8 @@
 
 #include "../stb_image.h"
 
+#include "../renderers/MaterialPreview.hpp"
+
 const char *glsl_version = "#version 130";
 
 void ConsoleLogWindow();
@@ -267,8 +269,23 @@ void Window::onUpdate()
     // {
     //     std::string s(std::to_string(io->Framerate));
     //     ImGui::Text(s.c_str());
+
+    //     // auto material = SceneManager::GetInstance()->materials[0];
+    //     // if (ImGui::Button("Mark material for preview"))
+    //     // {
+    //     //     MaterialPreview::GetInstance()->markForPreview(material);
+    //     // }
+    //     // glViewport(0, 0, MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE);
+    //     // ImGui::Image(
+    //     //     (ImTextureID)material->previewTexture,
+    //     //     ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE),
+    //     //     ImVec2(0, 1),
+    //     //     ImVec2(1, 0));
+    //     // MaterialPreview::GetInstance()->renderPreviews();
     // }
     // ImGui::End();
+
+    MaterialPreview::GetInstance()->renderPreviews();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

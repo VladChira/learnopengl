@@ -11,6 +11,7 @@
 
 #include "../../SceneManager.hpp"
 #include "../../renderers/OpenGlRenderer.hpp"
+#include "../../renderers/MaterialPreview.hpp"
 
 void rasterizerSettings(OpenGlRenderer *renderer)
 {
@@ -46,5 +47,16 @@ void rasterizerSettings(OpenGlRenderer *renderer)
         ImGui::Checkbox("Enable light gizmos", &renderer->drawLightGizmos);
         ImGui::Checkbox("Enable transform gizmos", &renderer->drawTransformGizmos);
         ImGui::Checkbox("Wireframe Mode", &renderer->wireframeMode);
+
+        ImGui::Separator();
+        if (ImGui::Button("Regenerate all material previews", ImVec2(0, 40)))
+        {
+            for (int i = 0; i < SceneManager::GetInstance()->materials.size(); i++)
+            {
+                auto mat = SceneManager::GetInstance()->materials[i];
+                MaterialPreview::GetInstance()->markForPreview(mat);
+            }
+        }
+
     }
 }

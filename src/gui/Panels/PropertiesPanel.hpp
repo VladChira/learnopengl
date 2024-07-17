@@ -14,6 +14,7 @@
 #include "../../lights/PointLight.hpp"
 #include "../../lights/DirectionalLight.hpp"
 #include "../../entities/SpherePrimitive.hpp"
+#include "../../renderers/MaterialPreview.hpp"
 
 void displayBaseEntityProperties(std::shared_ptr<Entity> entity);
 void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent);
@@ -63,8 +64,8 @@ void displayMaterialProperties(std::shared_ptr<Entity> ent)
 {
     if (ImGui::CollapsingHeader("Material Settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        Entity *entity = ent.get();
-        Material *mat = dynamic_cast<Material *>(entity);
+        std::shared_ptr<Material> mat_ptr = std::dynamic_pointer_cast<Material>(ent);
+        Material *mat = mat_ptr.get();
 
         ImGui::Separator();
 
@@ -76,6 +77,16 @@ void displayMaterialProperties(std::shared_ptr<Entity> ent)
 
         ImGui::ButtonEx(Material::MaterialTypeToString(mat->getMaterialType()).c_str(), sz);
         ImGui::PopItemFlag();
+
+        glViewport(0, 0, MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE);
+
+        ImGui::SetCursorPos(ImGui::GetCursorPos() + ((ImGui::GetContentRegionAvail() * 0.5f) - ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE) * 0.5f));
+        ImGui::Image((ImTextureID)mat->previewTexture, ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE));
+
+        if (ImGui::Button("Regenerate preview", ImVec2(0, 40)))
+        {
+            MaterialPreview::GetInstance()->markForPreview(mat_ptr);
+        }
 
         if (mat->getMaterialType() == MaterialType::Phong)
         {

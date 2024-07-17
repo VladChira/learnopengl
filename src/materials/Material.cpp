@@ -6,6 +6,7 @@ Material::Material(MaterialType type) : Entity(EntityType::Material)
 {
     this->setName("Material");
     this->materialType = type;
+
     Console::GetInstance()->addLogEntry("Created new material of type " + MaterialTypeToString(type));
 }
 

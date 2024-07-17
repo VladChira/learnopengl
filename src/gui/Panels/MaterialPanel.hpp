@@ -25,7 +25,7 @@ void layoutMaterials()
     for (int i = 0; i < SceneManager::GetInstance()->materials.size(); i++)
     {
         auto mat = SceneManager::GetInstance()->materials[i];
-        if (ImGui::ButtonEx((mat->getName() + "##" + mat->getUUID()).c_str(), ImVec2(previewSize, previewSize)))
+        if (ImGui::ImageButton((mat->getName() + "##" + mat->getUUID()).c_str(), (ImTextureID)mat->previewTexture, ImVec2(previewSize, previewSize)))
         {
             ImGui::SetWindowFocus("Properties");
             SceneManager::GetInstance()->selectedEntity = mat;

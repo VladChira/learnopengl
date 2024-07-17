@@ -34,6 +34,8 @@ public:
 
     virtual void setUniforms(Shader &shader) = 0;
 
+    unsigned int previewTexture = 0;
+
 private:
     MaterialType materialType;
 };
