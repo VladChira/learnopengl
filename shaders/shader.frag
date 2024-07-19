@@ -112,7 +112,12 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // combine results
     vec3 ambient;
     if (material.useDiffuseMap)
-        ambient = vec3(texture(material.diffuseMap, TexCoords));
+    {
+        vec4 t = texture(material.diffuseMap, TexCoords);
+        if (t.a < 0.1)
+            discard;
+        ambient = vec3(t);
+    }
     else
         ambient = material.ambient;
 
@@ -148,7 +153,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // combine results
     vec3 ambient;
     if (material.useDiffuseMap)
-        ambient = vec3(texture(material.diffuseMap, TexCoords));
+    {
+        vec4 t = texture(material.diffuseMap, TexCoords);
+        if (t.a < 0.1)
+            discard;
+        ambient = vec3(t);
+    }
     else
         ambient = material.ambient;
 

@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "imgui.h"
@@ -15,7 +15,7 @@
 #include "ImGuizmo.h"
 
 #include "Events.hpp"
-#include "../renderers/OpenGlRenderer.hpp"
+#include "renderers/OpenGlRenderer.hpp"
 
 class Window
 {

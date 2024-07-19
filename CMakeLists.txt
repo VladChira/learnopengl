@@ -16,6 +16,10 @@ set(BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
 file(MAKE_DIRECTORY ${BUILD_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
 
+# Define the root directory of the project
+set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
+# Pass the root directory as a preprocessor definition
+add_compile_definitions(PROJECT_ROOT_DIR="${PROJECT_ROOT_DIR}")
 
 # Source files here
 file(GLOB_RECURSE SRC_FILES
@@ -25,15 +29,21 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 include_directories(
+	src
 	src/cameras
-	src/framebuffer
-	src/openglcontext
-	src/gui
+	src/entities
 	src/events
+	src/framebuffer
+	src/gui
+	src/gui/Panels
+	src/lights
+	src/materials
+	src/renderers
 )
 
 # Add the external libraries
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/imgui)
+add_subdirectory(external/glad)
 
 # Add the source files
 set(SRCS ${SRC_FILES})
@@ -41,30 +51,42 @@ set(SRCS ${SRC_FILES})
 # Add the executable
 add_executable(rasterizer ${SRCS})
 
-include(FetchContent)
+target_include_directories(rasterizer PUBLIC external/glad/include)
 
+# ------------------  Link external libraries-------------------------
+
+# -------------------------- GLM -------------------------------------
+include(FetchContent)
 FetchContent_Declare(
 	glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
 	GIT_TAG 	bf71a834948186f4097caa076cd2663c69a10e1e #refs/tags/1.0.1
 )
-
 FetchContent_MakeAvailable(glm)
+target_link_libraries(rasterizer PUBLIC glm::glm)
 
-# Link external libraries
+# ---------------------------ImGui -----------------------------------
+target_link_libraries(rasterizer PUBLIC imgui)
 
-target_link_libraries(rasterizer PRIVATE glm::glm)
 
-target_link_libraries(rasterizer PRIVATE imgui)
-
-find_package(glfw3 REQUIRED)
+# ---------------------------- GLFW --------------------------------
+include(FetchContent)
+FetchContent_Declare(glfw GIT_REPOSITORY https://github.com/glfw/glfw.git GIT_TAG master)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glfw)
 target_link_libraries(rasterizer PUBLIC glfw)
 
-find_package(GLEW REQUIRED)
-target_link_libraries(rasterizer PUBLIC GLEW)
+# ------------------------- GLAD ----------------
+target_link_libraries(rasterizer PUBLIC glad)
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(rasterizer PUBLIC OpenGL)
-
-find_package(assimp REQUIRED)
-target_link_libraries(rasterizer PRIVATE assimp::assimp)
+# --------------------------- ASSIMP ----------------
+set(ASSIMP_BUILD_TESTS OFF)
+FetchContent_Declare(
+  assimp
+  GIT_REPOSITORY https://github.com/assimp/assimp.git
+  GIT_TAG v5.4.2 # Specify the version or branch you want to use
+)
+FetchContent_MakeAvailable(assimp)
+target_link_libraries(rasterizer PUBLIC assimp)

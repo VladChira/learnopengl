@@ -29,8 +29,12 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
+    for (auto const& p : textures)
+    {
+        glDeleteTextures(1, &(p.second->id));
+    }
+    textures.clear();
     std::cout << "Destroying texture manager\n";
-    
 }
 
 TextureManager *TextureManager::GetInstance()

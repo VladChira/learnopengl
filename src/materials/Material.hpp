@@ -4,8 +4,8 @@
 #include <memory>
 #include <iostream>
 
-#include "../entities/Entity.hpp"
-#include "../Shader.hpp"
+#include "entities/Entity.hpp"
+#include "Shader.hpp"
 
 enum class MaterialType
 {

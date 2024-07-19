@@ -242,15 +242,15 @@ void Window::onUpdate()
     }
     ImGui::End();
 
-    if (ImGui::Begin("Console"))
-    {
-        ConsoleLogWindow();
-    }
-    ImGui::End();
-
     if (ImGui::Begin("Materials"))
     {
         layoutMaterials();
+    }
+    ImGui::End();
+
+    if (ImGui::Begin("Console"))
+    {
+        ConsoleLogWindow();
     }
     ImGui::End();
 
@@ -315,9 +315,9 @@ int Window::Init()
     else
         glfwSwapInterval(0);
 
-    if (glewInit() != GLEW_OK)
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Fatal error. GLEW initialisation failed!\n";
+        std::cout << "Fatal error. GLAD initialisation failed!\n";
         glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
@@ -354,7 +354,7 @@ int Window::Init()
                                    data->eventFn(event);
                                });
 
-    std::cout << "Successfully initialzed GLFW, GLEW and created window.\n";
+    std::cout << "Successfully initialzed GLFW, GLAD and created window.\n";
     initialized = true;
     return 0;
 }

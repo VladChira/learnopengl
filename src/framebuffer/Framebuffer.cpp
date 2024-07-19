@@ -1,5 +1,7 @@
 #include "Framebuffer.hpp"
 
+#include <glad/glad.h>
+
 void FrameBuffer::Init(float width, float height)
 {
 	glGenFramebuffers(1, &fbo);

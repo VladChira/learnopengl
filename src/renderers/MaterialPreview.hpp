@@ -5,21 +5,20 @@
 #include <iostream>
 #include <queue>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
-#include "../lights/PointLight.hpp"
-#include "../entities/SpherePrimitive.hpp"
-#include "../framebuffer/Framebuffer.hpp"
-#include "../materials/Material.hpp"
-#include "../cameras/Camera.hpp"
+#include "lights/PointLight.hpp"
+#include "entities/SpherePrimitive.hpp"
+#include "framebuffer/Framebuffer.hpp"
+#include "materials/Material.hpp"
+#include "cameras/Camera.hpp"
 
 class MaterialPreview
 {
 public:
 
     static const int PREVIEW_SIZE = 256;
-    static const int MAX_RENDERS_PER_FRAME = 2;
+    static const int MAX_RENDERS_PER_FRAME = 50;
 
     void markForPreview(std::shared_ptr<Material> material);
     void renderPreviews();

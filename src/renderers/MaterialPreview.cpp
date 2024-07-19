@@ -1,6 +1,6 @@
 #include "MaterialPreview.hpp"
 
-#include "../gui/Console.hpp"
+#include "gui/Console.hpp"
 
 MaterialPreview *MaterialPreview::mp_instance{nullptr};
 

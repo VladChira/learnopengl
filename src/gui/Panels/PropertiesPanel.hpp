@@ -9,12 +9,12 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "../../entities/Entity.hpp"
-#include "../../SceneManager.hpp"
-#include "../../lights/PointLight.hpp"
-#include "../../lights/DirectionalLight.hpp"
-#include "../../entities/SpherePrimitive.hpp"
-#include "../../renderers/MaterialPreview.hpp"
+#include "entities/Entity.hpp"
+#include "SceneManager.hpp"
+#include "lights/PointLight.hpp"
+#include "lights/DirectionalLight.hpp"
+#include "entities/SpherePrimitive.hpp"
+#include "renderers/MaterialPreview.hpp"
 
 void displayBaseEntityProperties(std::shared_ptr<Entity> entity);
 void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent);
@@ -80,7 +80,7 @@ void displayMaterialProperties(std::shared_ptr<Entity> ent)
 
         glViewport(0, 0, MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE);
 
-        ImGui::SetCursorPos(ImGui::GetCursorPos() + ((ImGui::GetContentRegionAvail() * 0.5f) - ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE) * 0.5f));
+        ImGui::SetCursorPosX((ImGui::GetCursorPos() + ((ImGui::GetContentRegionAvail() * 0.5f) - ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE) * 0.5f)).x);
         ImGui::Image((ImTextureID)mat->previewTexture, ImVec2(MaterialPreview::PREVIEW_SIZE, MaterialPreview::PREVIEW_SIZE));
 
         if (ImGui::Button("Regenerate preview", ImVec2(0, 40)))
@@ -93,6 +93,8 @@ void displayMaterialProperties(std::shared_ptr<Entity> ent)
             PhongMaterial *p_mat = dynamic_cast<PhongMaterial *>(mat);
             if (p_mat == nullptr)
                 return;
+
+            ImGui::SliderFloat("kA", &(p_mat->ka), 0.0f, 1.0f);
 
             ImGui::Checkbox("Use diffuse texture", &(p_mat->useDiffuseMap));
             ImGui::ColorEdit3("Diffuse Color", p_mat->diffuse);
@@ -234,32 +236,41 @@ void displayPrimitiveEntityProperties(std::shared_ptr<Entity> ent)
     Entity *entity = ent.get();
     Primitive *primitive = dynamic_cast<Primitive *>(entity);
 
-    if (primitive->primitiveType == PrimitiveType::Cube)
+    if (ImGui::CollapsingHeader("Primitive settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
-    }
-    else
-    {
-        if (primitive->primitiveType == PrimitiveType::Sphere)
+
+        if (primitive->primitiveType == PrimitiveType::Cube)
         {
-            SpherePrimitive *sphere = dynamic_cast<SpherePrimitive *>(primitive);
-
-            bool smoothShading = sphere->getSmooth();
-            if (ImGui::Checkbox("Shade smooth", &smoothShading))
+        }
+        else
+        {
+            if (primitive->primitiveType == PrimitiveType::Sphere)
             {
-                sphere->setSmooth(smoothShading);
+                SpherePrimitive *sphere = dynamic_cast<SpherePrimitive *>(primitive);
+
+                bool smoothShading = sphere->getSmooth();
+                if (ImGui::Checkbox("Shade smooth", &smoothShading))
+                {
+                    sphere->setSmooth(smoothShading);
+                }
+
+                if (ImGui::Button("Flip Normals"))
+                {
+                    sphere->reverseNormals();
+                }
+
+                float radius = sphere->getRadius();
+                if (ImGui::DragFloat("Sphere radius", &radius, 0.1f, 0.0f, 20.0f))
+                    sphere->setRadius(radius);
+
+                int sectorCount = sphere->getSectorCount();
+                if (ImGui::DragInt("Number of sectors", &sectorCount, 1, SpherePrimitive::MIN_SECTOR_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
+                    sphere->setSectorCount(sectorCount);
+
+                int stackCount = sphere->getStackCount();
+                if (ImGui::DragInt("Number of stacks", &stackCount, 1, SpherePrimitive::MIN_STACK_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
+                    sphere->setStackCount(stackCount);
             }
-
-            float radius = sphere->getRadius();
-            if (ImGui::DragFloat("Sphere radius", &radius, 0.1f, 0.0f, 20.0f))
-                sphere->setRadius(radius);
-
-            int sectorCount = sphere->getSectorCount();
-            if (ImGui::DragInt("Number of sectors", &sectorCount, 1, SpherePrimitive::MIN_SECTOR_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
-                sphere->setSectorCount(sectorCount);
-
-            int stackCount = sphere->getStackCount();
-            if (ImGui::DragInt("Number of stacks", &stackCount, 1, SpherePrimitive::MIN_STACK_COUNT, 100, "%d", ImGuiSliderFlags_AlwaysClamp))
-                sphere->setStackCount(stackCount);
         }
     }
 }

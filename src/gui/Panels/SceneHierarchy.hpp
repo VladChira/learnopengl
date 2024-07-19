@@ -8,8 +8,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "../../entities/Entity.hpp"
-#include "../../SceneManager.hpp"
+#include "entities/Entity.hpp"
+#include "SceneManager.hpp"
 
 void displayNode(std::shared_ptr<Entity> currentEntity, std::shared_ptr<Entity> selectedEntity)
 {

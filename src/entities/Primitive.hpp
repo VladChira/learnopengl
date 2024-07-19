@@ -1,11 +1,10 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 #include "Entity.hpp"
 
-#include "../materials/PhongMaterial.hpp"
+#include "materials/PhongMaterial.hpp"
 
 enum class PrimitiveType
 {

@@ -6,8 +6,8 @@
 
 #include "ImGuizmo.h"
 
-#include "../Shader.hpp"
-#include "../entities/Entity.hpp"
+#include "Shader.hpp"
+#include "entities/Entity.hpp"
 
 enum class LightType
 {

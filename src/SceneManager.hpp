@@ -5,11 +5,11 @@
 
 #include <glm/glm.hpp>
 
-#include "../entities/Entity.hpp"
-#include "../cameras/Camera.hpp"
+#include "entities/Entity.hpp"
+#include "cameras/Camera.hpp"
 #include "Mesh.hpp"
 #include "Model.hpp"
-#include "../entities/Primitive.hpp"
+#include "entities/Primitive.hpp"
 #include "lights/Light.hpp"
 #include "materials/PhongMaterial.hpp"
 

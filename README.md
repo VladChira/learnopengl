@@ -32,7 +32,7 @@
 - Compute shaders?
 
 Dependencies (so far):
-- OpenGL w/ GLEW & GLFW
+- OpenGL w/ GLAD & GLFW
 - Dear ImGUI - docking branch
 - ImGuizmo
 - stb_image.h

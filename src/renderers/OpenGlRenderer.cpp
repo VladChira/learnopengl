@@ -2,9 +2,9 @@
 
 #include "../SceneManager.hpp"
 
-#include "../entities/CubePrimitive.hpp"
-#include "../lights/PointLight.hpp"
-#include "../lights/DirectionalLight.hpp"
+#include "entities/CubePrimitive.hpp"
+#include "lights/PointLight.hpp"
+#include "lights/DirectionalLight.hpp"
 #include "MaterialPreview.hpp"
 
 unsigned int OpenGlRenderer::getFrameBufferTexture()

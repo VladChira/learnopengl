@@ -4,8 +4,8 @@
 
 #include <glm/glm.hpp>
 
-#include "../TextureManager.hpp"
-#include "../Shader.hpp"
+#include "TextureManager.hpp"
+#include "Shader.hpp"
 
 class PhongMaterial : public Material
 {
