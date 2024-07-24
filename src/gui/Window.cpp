@@ -27,10 +27,10 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     this->initialized = false;
     this->vsyncEnabled = enableVsync;
 
-    Logger::GetLogger()->info("Initializing window...");
+    LOG_INFO("Initializing window...");
     this->Init();
 
-    Logger::GetLogger()->info("Initializing ImGui...");
+    LOG_INFO("Initializing ImGui...");
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -46,20 +46,20 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load textures needed for GUI
-    Logger::GetLogger()->info("Loading UI textures...");
+    LOG_INFO("Loading UI textures...");
     bool ok = TextureFromFile("../textures/icons/light.png", addLightButtonTex);
     if (!ok)
-        Logger::GetLogger()->error("Failed to load texture for Add Light Button");
+        LOG_ERROR("Failed to load texture for Add Light Button");
 
-    Logger::GetLogger()->info("Successfully initialized ImGui");
+    LOG_INFO("Successfully initialized ImGui");
 
-    Logger::GetLogger()->info("Creating OpenGL renderer instance");
+    LOG_INFO("Creating OpenGL renderer instance");
     renderer = std::make_unique<OpenGlRenderer>(width, height);
 }
 
 Window::~Window()
 {
-    Logger::GetLogger()->info("Closing window...");
+    LOG_INFO("Closing window...");
     Shutdown();
 }
 
@@ -311,25 +311,25 @@ int Window::Init()
 
     if (!window)
     {
-        Logger::GetLogger()->critical("Fatal error. Failed to create window with GLFW");
+        LOG_CRITICAL("Fatal error. Failed to create window with GLFW");
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
     if (this->vsyncEnabled)
     {
-        Logger::GetLogger()->info("Vsync enabled");
+        LOG_INFO("Vsync enabled");
         glfwSwapInterval(1);
     }
     else
     {
-        Logger::GetLogger()->warn("Vsync is disabled");
+        LOG_WARN("Vsync is disabled");
         glfwSwapInterval(0);
     }
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        Logger::GetLogger()->critical("Fatal error. Failed to load GLAD");
+        LOG_CRITICAL("Fatal error. Failed to load GLAD");
         glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
@@ -366,7 +366,7 @@ int Window::Init()
                                    data->eventFn(event);
                                });
 
-    Logger::GetLogger()->info("Successfully created window");
+    LOG_INFO("Successfully created window");
     initialized = true;
     return 0;
 }
@@ -374,14 +374,14 @@ int Window::Init()
 void Window::Shutdown()
 {
     initialized = false;
-    Logger::GetLogger()->info("Shutting down ImGui...");
+    LOG_INFO("Shutting down ImGui...");
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
-    Logger::GetLogger()->info("Successfully destroyed window");
+    LOG_INFO("Successfully destroyed window");
 }
 
 void ConsoleLogWindow()
