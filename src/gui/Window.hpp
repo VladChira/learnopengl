@@ -32,14 +32,13 @@ public:
     Window &operator=(const Window &) = delete;
     Window &operator=(Window &&) = delete;
 
-    void onUpdate();
-    void setEventCallback(const EventCallbackFn &callback)
-    {
-        this->windowData.eventFn = callback;
-    }
+    inline void setRenderer(std::shared_ptr<OpenGlRenderer> renderer) { this->renderer = renderer; }
 
-    unsigned int getWidth() const { return this->windowData.width; }
-    unsigned int getHeight() const { return this->windowData.height; };
+    void onUpdate();
+    inline void setEventCallback(const EventCallbackFn &callback) { this->windowData.eventFn = callback; }
+
+    inline unsigned int getWidth() const { return this->windowData.width; }
+    inline unsigned int getHeight() const { return this->windowData.height; };
 
     float clearColor[4] = {1.0f, 0.0f, 0.0f, 0.0f};
 
@@ -63,9 +62,5 @@ private:
     bool initialized = false;
     bool vsyncEnabled = true;
 
-    unsigned int addLightButtonTex;
-
-    std::unique_ptr<OpenGlRenderer> renderer;
-
-    bool TextureFromFile(std::string filename, unsigned int &textureID);
+    std::shared_ptr<OpenGlRenderer> renderer = nullptr;
 };

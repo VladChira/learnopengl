@@ -7,6 +7,12 @@
 #include "lights/DirectionalLight.hpp"
 #include "MaterialPreview.hpp"
 
+void OpenGlRenderer::OnResize(float newWidth, float newHeight)
+{
+    this->width = newWidth;
+    this->height = newHeight;
+}
+
 unsigned int OpenGlRenderer::getFrameBufferTexture()
 {
     return sceneBuffer.getFrameTexture();
@@ -54,25 +60,25 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     this->height = height;
     sceneBuffer.Init(this->width, this->height);
 
-    std::shared_ptr<Model> model = std::make_shared<Model>();
-    model->Init("../models/sponza/sponza.obj");
-    glm::mat4 transform = glm::mat4(1.0f);
-    // transform = glm::translate(transform, glm::vec3(-1.5f, 0.0f, -1.5f));
-    // transform = glm::scale(transform, glm::vec3(0.01f));
-    model->transform = transform;
-    SceneManager::GetInstance()->addModel(model);
+    // std::shared_ptr<Model> model = std::make_shared<Model>();
+    // model->Init("../models/sponza/sponza.obj");
+    // glm::mat4 transform = glm::mat4(1.0f);
+    // model->transform = transform;
+    // SceneManager::GetInstance()->addModel(model);
 
-    std::shared_ptr<Model> model2 = std::make_shared<Model>();
-    model2->Init("../models/adamHead/adamHead.gltf");
-    transform = glm::mat4(1.0f);
-    model2->transform = transform;
-    SceneManager::GetInstance()->addModel(model2);
+    // std::shared_ptr<Model> model2 = std::make_shared<Model>();
+    // model2->Init("../models/adamHead/adamHead.gltf");
+    // transform = glm::mat4(1.0f);
+    // model2->transform = transform;
+    // SceneManager::GetInstance()->addModel(model2);
 
     glEnable(GL_DEPTH_TEST);
 }
 
 void OpenGlRenderer::Render()
 {
+    RescaleFrameBuffer(width, height);
+
     if (wireframeMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else

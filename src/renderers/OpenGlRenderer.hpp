@@ -20,11 +20,18 @@ class OpenGlRenderer
 {
 public:
     OpenGlRenderer(float width, float height);
+
     void Render();
+
     unsigned int getFrameBufferTexture();
-    void RescaleFrameBuffer(float width, float height);
 
     void enableGrid(bool enable) { this->drawGrid = enable; }
+
+    void OnResize(float newWidth, float newHeight);
+
+    inline float getWidth() { return width; }
+
+    inline float getHeight() { return height; }
 
     bool drawGrid = true;
     bool drawLightGizmos = true;
@@ -35,12 +42,12 @@ private:
     void initGrid();
     void initPointLightMarker();
     void initDirLightMarker();
+    void RescaleFrameBuffer(float width, float height);
 
     float width, height;
     FrameBuffer sceneBuffer;
 
     // Grid stuff
-
     Shader gridShader;
     unsigned int GRID_VAO;
     unsigned int GRID_LEN;

@@ -8,8 +8,7 @@
 
 #include "Events.hpp"
 #include "EventDispatcher.hpp"
-
-
+#include "renderers/OpenGlRenderer.hpp"
 
 class Application
 {
@@ -28,7 +27,11 @@ public:
     bool shouldClose() { return close; }
 
 private:
-    std::unique_ptr<Window> window;
     EventDispatcher eventDispatcher;
+
+    std::unique_ptr<Window> window;
     bool close = false;
+
+    std::shared_ptr<OpenGlRenderer> renderer;
+
 };

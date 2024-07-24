@@ -18,7 +18,7 @@ public:
     Primitive(PrimitiveType type) : Entity(EntityType::Primitive)
     {
         this->primitiveType = type;
-        material = std::make_shared<PhongMaterial>();
+        material = std::make_shared<PhongMaterial>(); // FIX ME: This should not be allocated here
         resetTransform();
     }
 

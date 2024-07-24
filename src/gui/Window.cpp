@@ -9,9 +9,9 @@
 #include "Panels/ToolsPanel.hpp"
 #include "Panels/MaterialPanel.hpp"
 
-#include "../stb_image.h"
+#include "stb_image.h"
 
-#include "../renderers/MaterialPreview.hpp"
+#include "renderers/MaterialPreview.hpp"
 
 const char *glsl_version = "#version 130";
 
@@ -44,17 +44,6 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     embraceTheDarkness();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    // Load textures needed for GUI
-    LOG_INFO("Loading UI textures...");
-    bool ok = TextureFromFile("../textures/icons/light.png", addLightButtonTex);
-    if (!ok)
-        LOG_ERROR("Failed to load texture for Add Light Button");
-
-    LOG_INFO("Successfully initialized ImGui");
-
-    LOG_INFO("Creating OpenGL renderer instance");
-    renderer = std::make_unique<OpenGlRenderer>(width, height);
 }
 
 Window::~Window()
@@ -148,6 +137,9 @@ void Window::onUpdate()
 
     if (ImGui::Begin("Viewport"))
     {
+        if (renderer == nullptr)
+            LOG_CRITICAL("Fatal error. No renderer has been added for preview");
+
         ImVec2 avail = ImGui::GetContentRegionAvail();
 
         // Define the aspect ratio of your scene
@@ -162,10 +154,8 @@ void Window::onUpdate()
             new_height = avail.y;
             new_width = avail.y * aspect_ratio;
         }
-        // Resize the framebuffer and set the viewport
-        renderer->RescaleFrameBuffer(new_width, new_height);
-        glViewport(0, 0, new_width, new_height);
-        renderer->Render();
+        // Notify the renderer that the size of the viewport has changed
+        renderer->OnResize(new_width, new_height);
 
         // Draw the texture with the calculated size
         unsigned int tex = renderer->getFrameBufferTexture();
@@ -231,7 +221,7 @@ void Window::onUpdate()
     ImGui::SetNextWindowClass(&c);
     if (ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoTitleBar))
     {
-        toolsPanel(addLightButtonTex);
+        // toolsPanel(addLightButtonTex);
     }
     ImGui::End();
 
@@ -500,41 +490,4 @@ void embraceTheDarkness()
     style.GrabRounding = 3;
     style.LogSliderDeadzone = 4;
     style.TabRounding = 4;
-}
-
-bool Window::TextureFromFile(std::string filename, unsigned int &textureID)
-{
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load from: " << filename << std::endl;
-        stbi_image_free(data);
-        return false;
-    }
-
-    return true;
 }
