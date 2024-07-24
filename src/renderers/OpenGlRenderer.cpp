@@ -19,19 +19,36 @@ void OpenGlRenderer::RescaleFrameBuffer(float width, float height)
 
 OpenGlRenderer::OpenGlRenderer(float width, float height)
 {
-    glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_FRAMEBUFFER_SRGB);
+    Logger::GetLogger()->info("Compiling shaders...");
 
-    gridShader.init("../shaders/grid.vert", "../shaders/grid.frag");
+    int allCompiled = 1;
+    int ok = gridShader.init("../shaders/grid.vert", "../shaders/grid.frag");
+    
+    if (!ok)
+        Logger::GetLogger()->critical("Failed to compile grid shader");
     initGrid();
 
-    pointLightMarker.init("../shaders/pointlightmarker.vert", "../shaders/pointlightmarker.frag");
+    ok = pointLightMarker.init("../shaders/pointlightmarker.vert", "../shaders/pointlightmarker.frag");
+    allCompiled &= ok;
+    if (!ok)
+        Logger::GetLogger()->critical("Failed to compile point light marker shader");
     initPointLightMarker();
 
-    dirLightMarker.init("../shaders/dirlightmarker.vert", "../shaders/dirlightmarker.frag");
+    ok = dirLightMarker.init("../shaders/dirlightmarker.vert", "../shaders/dirlightmarker.frag");
+    allCompiled &= ok;
+    if (!ok)
+        Logger::GetLogger()->critical("Failed to compile dir light marker shader");
     initDirLightMarker();
 
-    meshShader.init("../shaders/shader.vert", "../shaders/shader.frag");
+    ok = meshShader.init("../shaders/shader.vert", "../shaders/shader.frag");
+    allCompiled &= ok;
+    if (!ok)
+        Logger::GetLogger()->critical("Failed to compile nmesh shader");
+
+    if (allCompiled)
+    {
+        Logger::GetLogger()->info("Successfully compiled shaders");
+    }
 
     this->width = width;
     this->height = height;
@@ -50,6 +67,8 @@ OpenGlRenderer::OpenGlRenderer(float width, float height)
     transform = glm::mat4(1.0f);
     model2->transform = transform;
     SceneManager::GetInstance()->addModel(model2);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void OpenGlRenderer::Render()

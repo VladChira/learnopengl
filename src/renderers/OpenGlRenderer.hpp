@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Logger.hpp"
+
 #include <glad/glad.h>
 
 #include <glm/glm.hpp>

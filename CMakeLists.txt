@@ -39,11 +39,13 @@ include_directories(
 	src/lights
 	src/materials
 	src/renderers
+	external
 )
 
 # Add the external libraries
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/imgui)
 add_subdirectory(external/glad)
+# add_subdirectory(external/spdlog)
 
 # Add the source files
 set(SRCS ${SRC_FILES})
@@ -51,9 +53,10 @@ set(SRCS ${SRC_FILES})
 # Add the executable
 add_executable(rasterizer ${SRCS})
 
-target_include_directories(rasterizer PUBLIC external/glad/include)
-
 # ------------------  Link external libraries-------------------------
+
+# -------------------------- SPDLOG -------------------------------------
+# target_link_libraries(rasterizer PUBLIC spdlog)
 
 # -------------------------- GLM -------------------------------------
 include(FetchContent)
@@ -79,6 +82,7 @@ FetchContent_MakeAvailable(glfw)
 target_link_libraries(rasterizer PUBLIC glfw)
 
 # ------------------------- GLAD ----------------
+target_include_directories(rasterizer PUBLIC external/glad/include)
 target_link_libraries(rasterizer PUBLIC glad)
 
 # --------------------------- ASSIMP ----------------

@@ -26,8 +26,11 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     this->windowData.height = height;
     this->initialized = false;
     this->vsyncEnabled = enableVsync;
+
+    Logger::GetLogger()->info("Initializing window...");
     this->Init();
 
+    Logger::GetLogger()->info("Initializing ImGui...");
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -43,17 +46,20 @@ Window::Window(std::string title, const unsigned int width, const unsigned int h
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load textures needed for GUI
+    Logger::GetLogger()->info("Loading UI textures...");
     bool ok = TextureFromFile("../textures/icons/light.png", addLightButtonTex);
     if (!ok)
-        std::cout << "Failed to load texture for Add Light Button.\n";
+        Logger::GetLogger()->error("Failed to load texture for Add Light Button");
 
-    std::cout << "Successfully initialzed ImGui.\n";
+    Logger::GetLogger()->info("Successfully initialized ImGui");
 
+    Logger::GetLogger()->info("Creating OpenGL renderer instance");
     renderer = std::make_unique<OpenGlRenderer>(width, height);
 }
 
 Window::~Window()
 {
+    Logger::GetLogger()->info("Closing window...");
     Shutdown();
 }
 
@@ -305,19 +311,25 @@ int Window::Init()
 
     if (!window)
     {
-        std::cout << "Fatal error. Failed to create window!\n";
+        Logger::GetLogger()->critical("Fatal error. Failed to create window with GLFW");
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
     if (this->vsyncEnabled)
+    {
+        Logger::GetLogger()->info("Vsync enabled");
         glfwSwapInterval(1);
+    }
     else
+    {
+        Logger::GetLogger()->warn("Vsync is disabled");
         glfwSwapInterval(0);
+    }
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Fatal error. GLAD initialisation failed!\n";
+        Logger::GetLogger()->critical("Fatal error. Failed to load GLAD");
         glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
@@ -354,7 +366,7 @@ int Window::Init()
                                    data->eventFn(event);
                                });
 
-    std::cout << "Successfully initialzed GLFW, GLAD and created window.\n";
+    Logger::GetLogger()->info("Successfully created window");
     initialized = true;
     return 0;
 }
@@ -362,16 +374,14 @@ int Window::Init()
 void Window::Shutdown()
 {
     initialized = false;
-
+    Logger::GetLogger()->info("Shutting down ImGui...");
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
-    std::cout << "Destroying window\n";
-
-    TextureManager::DestroyInstance();
+    Logger::GetLogger()->info("Successfully destroyed window");
 }
 
 void ConsoleLogWindow()

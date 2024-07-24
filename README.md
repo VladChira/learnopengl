@@ -33,6 +33,7 @@
 
 Dependencies (so far):
 - OpenGL w/ GLAD & GLFW
+- spdlog
 - Dear ImGUI - docking branch
 - ImGuizmo
 - stb_image.h

@@ -16,7 +16,7 @@ public:
     unsigned int ID;
     // generates the shader on the fly
     // ------------------------------------------------------------------------
-    void init(const char* vertexPath, const char* fragmentPath)
+    bool init(const char* vertexPath, const char* fragmentPath)
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -45,6 +45,7 @@ public:
         catch (std::ifstream::failure& e)
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+            return false;
         }
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
@@ -54,22 +55,23 @@ public:
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, &vShaderCode, NULL);
         glCompileShader(vertex);
-        checkCompileErrors(vertex, "VERTEX");
+        if (!checkCompileErrors(vertex, "VERTEX")) return false;
         // fragment Shader
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragment, 1, &fShaderCode, NULL);
         glCompileShader(fragment);
-        checkCompileErrors(fragment, "FRAGMENT");
+        if (!checkCompileErrors(fragment, "FRAGMENT")) return false;
         // shader Program
         ID = glCreateProgram();
         glAttachShader(ID, vertex);
         glAttachShader(ID, fragment);
         glLinkProgram(ID);
-        checkCompileErrors(ID, "PROGRAM");
+        if (!checkCompileErrors(ID, "PROGRAM")) return false;
         // delete the shaders as they're linked into our program now and no longer necessary
         glDeleteShader(vertex);
         glDeleteShader(fragment);
 
+        return true;
     }
     // activate the shader
     // ------------------------------------------------------------------------
@@ -139,7 +141,7 @@ public:
 private:
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
-    void checkCompileErrors(GLuint shader, std::string type)
+    bool checkCompileErrors(GLuint shader, std::string type)
     {
         GLint success;
         GLchar infoLog[1024];
@@ -150,6 +152,7 @@ private:
             {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                return false;
             }
         }
         else
@@ -159,7 +162,9 @@ private:
             {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                return false;
             }
         }
+        return true;
     }
 };

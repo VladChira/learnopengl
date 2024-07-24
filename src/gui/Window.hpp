@@ -14,6 +14,8 @@
 
 #include "ImGuizmo.h"
 
+#include "Logger.hpp"
+
 #include "Events.hpp"
 #include "renderers/OpenGlRenderer.hpp"
 
